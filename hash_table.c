@@ -12,7 +12,7 @@
 union Hashable { // TODO Do I want pointers?
    int i;
    float f;
-   char str[50];
+   char *str;
 };
 
 typedef struct item {
@@ -52,6 +52,8 @@ int main() {
 
     union Hashable key;
     union Hashable value;
+    // value.str = malloc(50);
+    // snprintf(value.str, 50, "hello");
 
     key.i = 0;
     value.i = 0;
@@ -59,21 +61,27 @@ int main() {
     add_item_to_table(key, value, hash_table);
     print_table(hash_table);
 
-    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
     key.i = 1;
     value.i = 1;
+    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
     add_item_to_table(key, value, hash_table);
     print_table(hash_table);
 
-    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
     key.i = 2;
     value.i = 2;
+    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
     add_item_to_table(key, value, hash_table);
     print_table(hash_table);
 
-    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
     key.i = 3;
     value.i = 3;
+    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
+    add_item_to_table(key, value, hash_table);
+    print_table(hash_table);
+
+    key.i = 7;
+    value.i = 4;
+    printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key));
     add_item_to_table(key, value, hash_table);
     print_table(hash_table);
 
@@ -81,6 +89,7 @@ int main() {
 }
 
 HashTable* init(int size) {
+    printf("%li - %li\n", sizeof(Node), sizeof(Item));
     HashTable *hash_table = malloc(sizeof(HashTable));
     hash_table->size = size;
     hash_table->load = 0;
@@ -95,7 +104,16 @@ HashTable* init(int size) {
         null_node->next = malloc(sizeof(Node));
         null_node->next = NULL;
 
+        if (i > 0) {
+            printf("%i\n", (hash_table->items_list[0]->next == NULL));
+            printf("%i\n", (hash_table->items_list[0]->item == NULL));
+        }
+
         hash_table->items_list[i] = null_node;
+
+        printf("%i\n", (hash_table->items_list[0]->next == NULL));
+        printf("%i\n", (hash_table->items_list[0]->item == NULL));
+
         printf("%i\n", (hash_table->items_list[i]->next == NULL));
         printf("%i\n", (hash_table->items_list[i]->item == NULL));
     }
@@ -114,7 +132,7 @@ void add_item_to_table(union Hashable key, union Hashable value, HashTable *hash
     item->key = key;
     item->value = value;
 
-    int bin_index = hash < hash_table->size ? hash : hash_table->size % hash;
+    int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
     Node *items_list = hash_table->items_list[bin_index];
 
     hash_table->items_list[bin_index] = update_bin(item, items_list);
@@ -134,7 +152,9 @@ Node *update_bin(Item *item, Node *items_list) {
         return new;
     }
     else {
+        printf("Adding to non-empty bin\n");
         while (current_node->next != NULL) {
+            printf("Adding to non-empty bin\n");
             Item *current_item = current_node->item;
             print_item(current_item);
             if (current_item->key.i == item->key.i) {
@@ -167,6 +187,8 @@ void print_table(HashTable *hash_table) {
     for (i = 0; i < hash_table->size; i++) {
         printf("*Bin %i\n", i);
         Node *current_node = hash_table->items_list[i];
+        printf("%i\n", (current_node->next == NULL));
+        printf("%i\n", (current_node->item == NULL));
         if (current_node->next == NULL) {
             printf("(empty)\n");
         }
@@ -181,5 +203,5 @@ void print_table(HashTable *hash_table) {
 }
 
 void print_item(Item *item) {
-    printf("---Hash: %i\n---Key: %i\n---Value: %s\n", item->hash, item->key.i, item->value.str); // TODO change to print union
+    printf("------\n---Hash: %i\n---Key: %i\n---Value: %i\n------\n", item->hash, item->key.i, item->value.i); // TODO change to print union
 }
