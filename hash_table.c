@@ -89,7 +89,6 @@ int main() {
 }
 
 HashTable* init(int size) {
-    printf("%li - %li\n", sizeof(Node), sizeof(Item));
     HashTable *hash_table = malloc(sizeof(HashTable));
     hash_table->size = size;
     hash_table->load = 0;
@@ -97,25 +96,11 @@ HashTable* init(int size) {
     int i;
     for (i = 0; i < size; i++) {
         printf("Creating bin %i.\n", i);
-        Node *null_node = malloc(sizeof(Node));
 
-        null_node->item = malloc(sizeof(Item));
-        null_node->item = NULL;
-        null_node->next = malloc(sizeof(Node));
-        null_node->next = NULL;
-
-        if (i > 0) {
-            printf("%i\n", (hash_table->items_list[0]->next == NULL));
-            printf("%i\n", (hash_table->items_list[0]->item == NULL));
-        }
+        Node *null_node;
+        null_node = NULL;
 
         hash_table->items_list[i] = null_node;
-
-        printf("%i\n", (hash_table->items_list[0]->next == NULL));
-        printf("%i\n", (hash_table->items_list[0]->item == NULL));
-
-        printf("%i\n", (hash_table->items_list[i]->next == NULL));
-        printf("%i\n", (hash_table->items_list[i]->item == NULL));
     }
     return hash_table;
 }
@@ -144,7 +129,7 @@ Node *update_bin(Item *item, Node *items_list) {
     Node *head = items_list;
     Node *prev_node;
     Node *current_node = items_list;
-    if (current_node->next == NULL) {
+    if (current_node == NULL) {
         printf("Adding to empty bin\n");
         Node *new = malloc(sizeof(Node));
         new->item = item;
@@ -153,7 +138,7 @@ Node *update_bin(Item *item, Node *items_list) {
     }
     else {
         printf("Adding to non-empty bin\n");
-        while (current_node->next != NULL) {
+        while (current_node != NULL) {
             printf("Adding to non-empty bin\n");
             Item *current_item = current_node->item;
             print_item(current_item);
@@ -187,13 +172,11 @@ void print_table(HashTable *hash_table) {
     for (i = 0; i < hash_table->size; i++) {
         printf("*Bin %i\n", i);
         Node *current_node = hash_table->items_list[i];
-        printf("%i\n", (current_node->next == NULL));
-        printf("%i\n", (current_node->item == NULL));
-        if (current_node->next == NULL) {
+        if (current_node == NULL) {
             printf("(empty)\n");
         }
         else {
-            while (current_node->next != NULL) {
+            while (current_node != NULL) {
                 print_item(current_node->item);
                 current_node = current_node->next;
             }
