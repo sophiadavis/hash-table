@@ -22,7 +22,7 @@ typedef struct item {
 } Item;
 
 typedef struct node {
-    Item *data;
+    Item *item;
     struct node *next;
 } Node;
 // Last item in list will have next set to NULL
@@ -59,16 +59,18 @@ HashTable* init(int size) {
     for (i = 0; i < size; i++) {
         printf("Creating bin %i.\n", i);
         Node *null_node = malloc(sizeof(Node));
-        null_node->data = malloc(sizeof(Item));
-        null_node->data = NULL;
+
+        null_node->item = malloc(sizeof(Item));
+        null_node->item = NULL;
         null_node->next = malloc(sizeof(Node));
         null_node->next = NULL;
+
         hash_table->items_list[i] = null_node;
     }
     return hash_table;
 }
 
-// add
+// void add_item
 
 // remove
 
@@ -89,7 +91,7 @@ void print_table(HashTable *hash_table) {
         }
         else {
             while (current_node->next != NULL) {
-                print_item(current_node->data);
+                print_item(current_node->item);
                 current_node = current_node->next;
             }
         }
