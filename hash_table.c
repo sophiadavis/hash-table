@@ -29,7 +29,7 @@ typedef struct node {
 typedef struct hash_table {
     int size;
     int load;
-    Node *items_list[];
+    Node **items_list;
 } HashTable;
 
 /***
