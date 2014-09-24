@@ -31,7 +31,7 @@ typedef struct hash_table {
     int size;
     int load;
     float max_load_proportion;
-    Node **items_list;
+    Node **bin_list;
 } HashTable;
 
 /***
@@ -44,12 +44,12 @@ void print_item(Item *item);
 int calculate_hash(union Hashable key);
 
 HashTable *add_item_to_table(int hash, union Hashable key, union Hashable value, HashTable *hash_table);
-Node *add_item_to_bin(Item *item, Node *items_list);
+Node *add_item_to_bin(Item *item, Node *bin_list);
 
 Item *lookup(union Hashable key, HashTable *hash_table);
 
 Item *remove_item_from_table(union Hashable key, HashTable *hash_table);
-Node *remove_item_from_bin(union Hashable key, Node *items_list);
+Node *remove_item_from_bin(union Hashable key, Node *bin_list);
 
 HashTable *resize(HashTable *hash_table);
 
@@ -162,14 +162,14 @@ HashTable *init(int size, float max_load_proportion) {
     hash_table->size = size;
     hash_table->max_load_proportion = max_load_proportion;
     hash_table->load = 0;
-    hash_table->items_list = malloc(size*sizeof(Node*));
+    hash_table->bin_list = malloc(size*sizeof(Node*));
 
     int i;
     for (i = 0; i < size; i++) {
         Node *null_node;
         null_node = NULL;
 
-        hash_table->items_list[i] = null_node;
+        hash_table->bin_list[i] = null_node;
     }
     return hash_table;
 }
@@ -192,18 +192,18 @@ HashTable *add_item_to_table(int hash, union Hashable key, union Hashable value,
     item->value = value;
 
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
-    Node *items_list = hash_table->items_list[bin_index];
+    Node *bin_list = hash_table->bin_list[bin_index];
 
-    hash_table->items_list[bin_index] = add_item_to_bin(item, items_list);
+    hash_table->bin_list[bin_index] = add_item_to_bin(item, bin_list);
 
     hash_table->load++;
     return hash_table;
 }
 
-Node *add_item_to_bin(Item *item, Node *items_list) {
-    Node *head = items_list;
+Node *add_item_to_bin(Item *item, Node *bin_list) {
+    Node *head = bin_list;
     Node *prev_node;
-    Node *current_node = items_list;
+    Node *current_node = bin_list;
     if (current_node == NULL) {
         Node *new = malloc(sizeof(Node));
         new->item = item;
@@ -232,7 +232,7 @@ Item *lookup(union Hashable key, HashTable *hash_table) {
     int hash = calculate_hash(key);
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
 
-    Node *current_node = hash_table->items_list[bin_index];
+    Node *current_node = hash_table->bin_list[bin_index];
 
     if (current_node == NULL) {
         printf("Item not found\n");
@@ -256,21 +256,21 @@ Item *remove_item_from_table(union Hashable key, HashTable *hash_table) {
     int hash = calculate_hash(key);
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
 
-    Node *items_list = hash_table->items_list[bin_index];
+    Node *bin_list = hash_table->bin_list[bin_index];
 
     Item *removed = lookup(key, hash_table);
     if (removed != NULL) {
-        hash_table->items_list[bin_index] = remove_item_from_bin(key, items_list);
+        hash_table->bin_list[bin_index] = remove_item_from_bin(key, bin_list);
         hash_table->load--;
     }
 
     return removed;
 }
 
-Node *remove_item_from_bin(union Hashable key, Node *items_list) {
-    Node *head = items_list;
-    Node *prev_node = items_list;
-    Node *current_node = items_list;
+Node *remove_item_from_bin(union Hashable key, Node *bin_list) {
+    Node *head = bin_list;
+    Node *prev_node = bin_list;
+    Node *current_node = bin_list;
     if (current_node == NULL) {
         printf("Item not found\n");
         return head;
@@ -303,7 +303,7 @@ HashTable *resize(HashTable *old_hash_table) {
 
     int i;
     for (i = 0; i < old_hash_table->size; i++) {
-        Node *current_node = old_hash_table->items_list[i];
+        Node *current_node = old_hash_table->bin_list[i];
         while (current_node != NULL) {
             Item *to_copy = current_node->item;
             new_hash_table = add_item_to_table(to_copy->hash, to_copy->key, to_copy->value, new_hash_table);
@@ -320,7 +320,7 @@ void print_table(HashTable *hash_table) {
     int i;
     for (i = 0; i < hash_table->size; i++) {
         printf("*Bin %i\n", i);
-        Node *current_node = hash_table->items_list[i];
+        Node *current_node = hash_table->bin_list[i];
         if (current_node == NULL) {
             printf("(empty)\n");
         }
