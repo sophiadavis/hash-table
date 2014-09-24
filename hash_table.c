@@ -16,7 +16,7 @@ union Hashable { // TODO Do I want pointers?
 };
 
 typedef struct item {
-    int *hash;
+    int hash;
     union Hashable key;
     union Hashable value;
 } Item;
@@ -60,9 +60,7 @@ HashTable* init(int size) {
         printf("Creating bin %i.\n", i);
         Node *null_node = malloc(sizeof(Node));
         null_node->data = malloc(sizeof(Item));
-        // null_node->data = NULL; // TODO why won't this work?
-        null_node->data->hash = malloc(sizeof(int));
-        *(null_node->data->hash) = 0;
+        null_node->data = NULL;
         null_node->next = malloc(sizeof(Node));
         null_node->next = NULL;
         hash_table->items_list[i] = null_node;
@@ -85,7 +83,6 @@ void print_table(HashTable *hash_table) {
     for (i = 0; i < hash_table->size; i++) {
         printf("*Bin %i\n", i);
         Node *current_node = hash_table->items_list[i];
-        // printf("%i\n", *(current_node->data->hash));
         printf("%i\n", current_node->next == NULL);
         if (current_node->next == NULL) {
             printf("(empty)\n");
@@ -100,5 +97,5 @@ void print_table(HashTable *hash_table) {
 }
 
 void print_item(Item *item) {
-    printf("-Hash: %i\n-Key: %i\n-Value: %s\n", *(item->hash), item->key.i, item->value.str); // TODO change to print union
+    printf("-Hash: %i\n-Key: %i\n-Value: %s\n", item->hash, item->key.i, item->value.str); // TODO change to print union
 }
