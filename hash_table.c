@@ -4,10 +4,6 @@
 #include <math.h>
 
 /***
-*
-***/
-
-/***
 * Structs and Unions
 ***/
 union Hashable { // TODO Do I want pointers?
@@ -42,6 +38,7 @@ void print_table(HashTable *hash_table);
 void print_item(Item *item);
 
 int calculate_hash(union Hashable key);
+int max_load_reached(HashTable *hashtable);
 
 HashTable *add_item_to_table(int hash, union Hashable key, union Hashable value, HashTable *hash_table);
 Node *add_item_to_bin(Item *item, Node *bin_list);
@@ -55,7 +52,7 @@ HashTable *resize(HashTable *hash_table);
 
 
 /***
-* Program
+* Some tests
 ***/
 int main() {
     HashTable *hash_table = init(4, 0.5);
@@ -154,9 +151,16 @@ int main() {
     removed = remove_item_from_table(key, hash_table);
     print_item(removed);
 
+    // union Hashable value;
+    // value.str = malloc(50);
+    // snprintf(value.str, 50, "hello");
+
     return 0;
 }
 
+/***
+* Creates a new hash table, with all bins initialized to NULL
+***/
 HashTable *init(int size, float max_load_proportion) {
     HashTable *hash_table = malloc(sizeof(HashTable));
     hash_table->size = size;
@@ -168,7 +172,6 @@ HashTable *init(int size, float max_load_proportion) {
     for (i = 0; i < size; i++) {
         Node *null_node;
         null_node = NULL;
-
         hash_table->bin_list[i] = null_node;
     }
     return hash_table;
@@ -178,10 +181,20 @@ int calculate_hash(union Hashable key) {
     return key.i; // TODO actually hash the keys
 }
 
+int max_load_reached(HashTable *hash_table) {
+    return (((float)(hash_table->load + 1) / (float)hash_table->size) > hash_table->max_load_proportion);
+}
+
+/***
+* Adds a key, value pair to hashtable, resizing if hashtable's max_load has been reached
+*   If a key's hash has not yet been computed, the hash should be set to HUGE_VAL.
+*   This seems hacky, but it's to avoid re-hashing keys when the hashtable is resized.
+***/
 HashTable *add_item_to_table(int hash, union Hashable key, union Hashable value, HashTable *hash_table) {
-    if (((float)(hash_table->load + 1) / (float)hash_table->size) > hash_table->max_load_proportion){
+    if (max_load_reached(hash_table)){
         hash_table = resize(hash_table);
     }
+
     if (hash == (int)HUGE_VAL) {
         hash = calculate_hash(key);
     }
@@ -200,6 +213,10 @@ HashTable *add_item_to_table(int hash, union Hashable key, union Hashable value,
     return hash_table;
 }
 
+/***
+* Adds item to the linked list at the given bin
+*   If the new item has the same key as an existing item, the value is updated.
+***/
 Node *add_item_to_bin(Item *item, Node *bin_list) {
     Node *head = bin_list;
     Node *prev_node;
@@ -228,6 +245,9 @@ Node *add_item_to_bin(Item *item, Node *bin_list) {
     }
 }
 
+/***
+* Returns item associated with the given key, or NULL if no such item exists.
+***/
 Item *lookup(union Hashable key, HashTable *hash_table) {
     int hash = calculate_hash(key);
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
@@ -252,6 +272,9 @@ Item *lookup(union Hashable key, HashTable *hash_table) {
     return NULL;
 }
 
+/***
+* Removes and returns item with given key from hashtable, or NULL if no such item exists.
+***/
 Item *remove_item_from_table(union Hashable key, HashTable *hash_table) {
     int hash = calculate_hash(key);
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
@@ -267,15 +290,15 @@ Item *remove_item_from_table(union Hashable key, HashTable *hash_table) {
     return removed;
 }
 
+/***
+* Removes item from the linked list at the given bin
+*   If the new item has the same key as an existing item, the value is updated.
+***/
 Node *remove_item_from_bin(union Hashable key, Node *bin_list) {
     Node *head = bin_list;
     Node *prev_node = bin_list;
     Node *current_node = bin_list;
-    if (current_node == NULL) {
-        printf("Item not found\n");
-        return head;
-    }
-    else {
+    if (current_node != NULL) {
         while (current_node != NULL) {
             Item *current_item = current_node->item;
             if (current_item->key.i == key.i) {
@@ -291,11 +314,15 @@ Node *remove_item_from_bin(union Hashable key, Node *bin_list) {
             prev_node = current_node;
             current_node = current_node->next;
         }
-        printf("Item not found\n");
-        return head;
     }
+    printf("Item not found\n");
+    return head;
 }
 
+/***
+* Creates a new hashtable with twice as many bins as the initial hashtable.
+*   All items are transferred to the new hashtable.
+***/
 HashTable *resize(HashTable *old_hash_table) {
     printf("Resizing from %i to %i.\n", old_hash_table->size, 2*old_hash_table->size);
     HashTable *new_hash_table = init(2*old_hash_table->size, old_hash_table->max_load_proportion);
@@ -314,6 +341,9 @@ HashTable *resize(HashTable *old_hash_table) {
 }
 
 
+/***
+* Helper functions to print hashtables and data items
+***/
 void print_table(HashTable *hash_table) {
     printf("\n********************\n--------HashTable--------\n-Array size: %i -Load: %i -Max Load Prop: %f -Current Load Prop: %f\n", hash_table->size, hash_table->load, hash_table->max_load_proportion, ((float)hash_table->load / (float)hash_table->size));
 
