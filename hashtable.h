@@ -46,6 +46,7 @@ void free_table(HashTable *hash_table);
 void free_item(Item *item);
 
 int calculate_hash(union Hashable key, hash_type key_type);
+int calculate_bin_index(int hash, int size);
 int max_load_reached(HashTable *hashtable);
 int hashable_equal(union Hashable h1, hash_type type1, union Hashable h2, hash_type type2);
 

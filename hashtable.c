@@ -20,17 +20,37 @@ HashTable *init(int size, float max_load_proportion) {
 }
 
 int calculate_hash(union Hashable key, hash_type key_type) {
+    int hash;
     switch (key_type) {
         case INTEGER:
-            return key.i;
+            hash = key.i;
+            break;
         case FLOAT:
-            return floor(key.f);
+            hash = floor(key.f);
+            break;
         case STRING:
-            return strlen(key.str);
+            hash = strlen(key.str);
+            break;
         default:
-            return 0;
+            hash = 0;
+            break;
     }
+    return hash;
      // TODO actually hash the keys
+}
+
+int calculate_bin_index(int hash, int size) {
+    int bin_index;
+    if (hash < 0) {
+        bin_index = (hash % size) + size;
+    }
+    else if (hash == 0) {
+        bin_index = 0;
+    }
+    else {
+        bin_index = hash % size;
+    }
+    return bin_index;
 }
 
 int max_load_reached(HashTable *hash_table) {
@@ -85,9 +105,9 @@ HashTable *add(int hash, union Hashable key, hash_type key_type, union Hashable 
 * Determines which bin a new item should be added to.
 ***/
 HashTable *add_item_to_table(Item *item, HashTable *hash_table) {
-    int bin_index = item->hash < hash_table->size ? item->hash : item->hash % hash_table->size;
-    Node *bin_list = hash_table->bin_list[bin_index];
+    int bin_index = calculate_bin_index(item->hash, hash_table->size);
 
+    Node *bin_list = hash_table->bin_list[bin_index];
     hash_table->bin_list[bin_index] = add_item_to_bin(item, bin_list);
 
     hash_table->load++;
@@ -131,7 +151,7 @@ Node *add_item_to_bin(Item *item, Node *bin_list) {
 ***/
 Item *lookup(union Hashable key, hash_type key_type, HashTable *hash_table) {
     int hash = calculate_hash(key, key_type);
-    int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
+    int bin_index = calculate_bin_index(hash, hash_table->size);
 
     Node *current_node = hash_table->bin_list[bin_index];
 
@@ -155,7 +175,7 @@ Item *lookup(union Hashable key, hash_type key_type, HashTable *hash_table) {
 ***/
 Item *remove_item_from_table(union Hashable key, hash_type key_type, HashTable *hash_table) {
     int hash = calculate_hash(key, key_type);
-    int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
+    int bin_index = calculate_bin_index(hash, hash_table->size);
 
     Node *bin_list = hash_table->bin_list[bin_index];
 
@@ -164,7 +184,6 @@ Item *remove_item_from_table(union Hashable key, hash_type key_type, HashTable *
         hash_table->bin_list[bin_index] = remove_item_from_bin(key, key_type, bin_list);
         hash_table->load--;
     }
-
     return removed;
 }
 
@@ -329,8 +348,8 @@ int main() {
     // snprintf(value.str, 50, "hello");
 
     // printf("~~~~~~~~~~~~~~~ Testing Add ~~~~~~~~~~~~~~~\n");
-    // key.i = INTEGER;
-    // value.i = INTEGER;
+    // key.i = 0;
+    // value.i = 0;
     // printf("\n~~~~~Adding %i -- %i (hash: %i)\n", key.i, value.i, calculate_hash(key, INTEGER));
     // hash_table = add(HUGE_VAL, key, INTEGER, value, INTEGER, hash_table);
     // print_table(hash_table);
