@@ -182,10 +182,13 @@ Node *remove_item_from_bin(union Hashable key, hash_type key_type, Node *bin_lis
             Item *current_item = current_node->item;
             if (hashable_equal(current_item->key, current_item->key_type, key, key_type)) {
                 if (current_node == head) {
-                    return current_node->next;
+                    Node *temp = current_node->next;
+                    free(current_node);
+                    return temp;
                 }
                 else {
                     prev_node->next = current_node->next;
+                    free(current_node);
                     return head;
                 }
             }
@@ -210,11 +213,14 @@ HashTable *resize(HashTable *old_hash_table) {
     for (i = 0; i < old_hash_table->size; i++) {
         Node *current_node = old_hash_table->bin_list[i];
         while (current_node != NULL) {
-            Item *to_copy = current_node->item;
-            new_hash_table = add_item_to_table(to_copy->hash, to_copy->key, to_copy->key_type, to_copy->value, to_copy->value_type, new_hash_table);
-            current_node = current_node->next;
+            new_hash_table = add_item_to_table(current_node->item, new_hash_table);
+            Node *temp = current_node->next;
+            free(current_node);
+            current_node = temp;
         }
     }
+    free(old_hash_table->bin_list);
+    free(old_hash_table);
     return new_hash_table;
 }
 
@@ -279,6 +285,31 @@ void print_item(Item *item) {
         }
         printf("------\n");
     }
+}
+
+void free_table(HashTable *hash_table) {
+    int i;
+    for (i = 0; i < hash_table->size; i++) {
+        Node *current_node = hash_table->bin_list[i];
+        while (current_node != NULL) {
+            free_item(current_node->item);
+            Node *temp_node = current_node->next;
+            free(current_node);
+            current_node = temp_node;
+        }
+    }
+    free(hash_table->bin_list);
+    free(hash_table);
+}
+
+void free_item(Item *item) {
+    if (item->key_type == STRING) {
+        free(item->key.str);
+    }
+    if (item->value_type == STRING) {
+        free(item->value.str);
+    }
+    free(item);
 }
 
 
