@@ -61,9 +61,7 @@ int hashable_equal(union Hashable h1, int type1, union Hashable h2, int type2) {
 *   If a key's hash has not yet been computed, the hash should be set to HUGE_VAL.
 *   This seems hacky, but it's to avoid re-hashing keys when the hashtable is resized.
 ***/
-HashTable *add_item_to_table(int hash, union Hashable key, int key_type, union Hashable value, int value_type, HashTable *hash_table) {
-    printf("hash: %i, key: %i (type: %i), value: %i (type: %i)\n", hash, key.i, key_type, value.i, value_type);
-    print_table(hash_table);
+HashTable *add(int hash, union Hashable key, int key_type, union Hashable value, int value_type, HashTable *hash_table) {
     if (max_load_reached(hash_table)){
         hash_table = resize(hash_table);
     }
@@ -79,7 +77,16 @@ HashTable *add_item_to_table(int hash, union Hashable key, int key_type, union H
     item->value = value;
     item->value_type = value_type;
 
-    int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
+    hash_table = add_item_to_table(item, hash_table);
+
+    return hash_table;
+}
+
+/***
+* Determines which bin a new item should be added to.
+***/
+HashTable *add_item_to_table(Item *item, HashTable *hash_table) {
+    int bin_index = item->hash < hash_table->size ? item->hash : item->hash % hash_table->size;
     Node *bin_list = hash_table->bin_list[bin_index];
 
     hash_table->bin_list[bin_index] = add_item_to_bin(item, bin_list);

@@ -7,6 +7,9 @@
 * Definitions
 ***/
 
+// For keeping track of Item key and value types
+typedef enum {INTEGER, FLOAT, STRING} hash_type;
+
 union Hashable {
    int i;
    float f;
@@ -49,7 +52,8 @@ int calculate_hash(union Hashable key, int key_type);
 int max_load_reached(HashTable *hashtable);
 int hashable_equal(union Hashable h1, int type1, union Hashable h2, int type2);
 
-HashTable *add_item_to_table(int hash, union Hashable key, int key_type, union Hashable value, int value_type, HashTable *hash_table);
+HashTable *add(int hash, union Hashable key, int key_type, union Hashable value, int value_type, HashTable *hash_table);
+HashTable *add_item_to_table(Item *item, HashTable *hash_table);
 Node *add_item_to_bin(Item *item, Node *bin_list);
 
 Item *lookup(union Hashable key, int key_type, HashTable *hash_table);
