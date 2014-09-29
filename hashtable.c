@@ -20,13 +20,13 @@ HashTable *init(int size, float max_load_proportion) {
     return hash_table;
 }
 
-int calculate_hash(union Hashable key, int key_type) {
+int calculate_hash(union Hashable key, hash_type key_type) {
     switch (key_type) {
-        case 0:
+        case INTEGER:
             return key.i;
-        case 1:
+        case FLOAT:
             return floor(key.f);
-        case 2:
+        case STRING:
             return strlen(key.str);
         default:
             return 0;
@@ -38,17 +38,17 @@ int max_load_reached(HashTable *hash_table) {
     return (((float)(hash_table->load + 1) / (float)hash_table->size) > hash_table->max_load_proportion);
 }
 
-int hashable_equal(union Hashable h1, int type1, union Hashable h2, int type2) {
+int hashable_equal(union Hashable h1, hash_type type1, union Hashable h2, hash_type type2) {
     if (type1 != type2) {
         return 0;
     }
     else {
         switch (type1) {
-            case 0:
+            case INTEGER:
                 return (h1.i == h2.i);
-            case 1:
+            case FLOAT:
                 return (h1.f == h2.f);
-            case 2:
+            case STRING:
                 return (strcmp(h1.str, h2.str) == 0);
             default:
                 return 0;
@@ -61,7 +61,7 @@ int hashable_equal(union Hashable h1, int type1, union Hashable h2, int type2) {
 *   If a key's hash has not yet been computed, the hash should be set to HUGE_VAL.
 *   This seems hacky, but it's to avoid re-hashing keys when the hashtable is resized.
 ***/
-HashTable *add(int hash, union Hashable key, int key_type, union Hashable value, int value_type, HashTable *hash_table) {
+HashTable *add(int hash, union Hashable key, hash_type key_type, union Hashable value, hash_type value_type, HashTable *hash_table) {
     if (max_load_reached(hash_table)){
         hash_table = resize(hash_table);
     }
@@ -130,7 +130,7 @@ Node *add_item_to_bin(Item *item, Node *bin_list) {
 /***
 * Returns item associated with the given key, or NULL if no such item exists.
 ***/
-Item *lookup(union Hashable key, int key_type, HashTable *hash_table) {
+Item *lookup(union Hashable key, hash_type key_type, HashTable *hash_table) {
     int hash = calculate_hash(key, key_type);
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
 
@@ -154,7 +154,7 @@ Item *lookup(union Hashable key, int key_type, HashTable *hash_table) {
 /***
 * Removes and returns item with given key from hashtable, or NULL if no such item exists.
 ***/
-Item *remove_item_from_table(union Hashable key, int key_type, HashTable *hash_table) {
+Item *remove_item_from_table(union Hashable key, hash_type key_type, HashTable *hash_table) {
     int hash = calculate_hash(key, key_type);
     int bin_index = hash < hash_table->size ? hash : hash % hash_table->size;
 
@@ -173,7 +173,7 @@ Item *remove_item_from_table(union Hashable key, int key_type, HashTable *hash_t
 * Removes item from the linked list at the given bin
 *   If the new item has the same key as an existing item, the value is updated.
 ***/
-Node *remove_item_from_bin(union Hashable key, int key_type, Node *bin_list) {
+Node *remove_item_from_bin(union Hashable key, hash_type key_type, Node *bin_list) {
     Node *head = bin_list;
     Node *prev_node = bin_list;
     Node *current_node = bin_list;
@@ -249,13 +249,13 @@ void print_item(Item *item) {
     else {
         printf("---------Hash: %i---Key: ", item->hash);
         switch (item->key_type) {
-            case 0:
+            case INTEGER:
                 printf("%i", item->key.i);
                 break;
-            case 1:
+            case FLOAT:
                 printf("%f", item->key.f);
                 break;
-            case 2:
+            case STRING:
                 printf("%s", item->key.str);
                 break;
             default:
@@ -264,13 +264,13 @@ void print_item(Item *item) {
         }
         printf("---Value: ");
         switch (item->value_type) {
-            case 0:
+            case INTEGER:
                 printf("%i", item->value.i);
                 break;
-            case 1:
+            case FLOAT:
                 printf("%f", item->value.f);
                 break;
-            case 2:
+            case STRING:
                 printf("%s", item->value.str);
                 break;
             default:

@@ -19,15 +19,10 @@ union Hashable {
 typedef struct item {
     int hash;
     union Hashable key;
-    int key_type;
+    hash_type key_type;
     union Hashable value;
-    int value_type;
+    hash_type value_type;
 } Item;
-
-// For keeping track of Item key and value types
-// const int 0 = 0;
-// const int 1 = 1;
-// const int 2 = 2;
 
 typedef struct node {
     Item *item;
@@ -47,18 +42,20 @@ typedef struct hash_table {
 HashTable *init(int size, float max_load_proportion);
 void print_table(HashTable *hash_table);
 void print_item(Item *item);
+void free_table(HashTable *hash_table);
+void free_item(Item *item);
 
-int calculate_hash(union Hashable key, int key_type);
+int calculate_hash(union Hashable key, hash_type key_type);
 int max_load_reached(HashTable *hashtable);
-int hashable_equal(union Hashable h1, int type1, union Hashable h2, int type2);
+int hashable_equal(union Hashable h1, hash_type type1, union Hashable h2, hash_type type2);
 
-HashTable *add(int hash, union Hashable key, int key_type, union Hashable value, int value_type, HashTable *hash_table);
+HashTable *add(int hash, union Hashable key, hash_type key_type, union Hashable value, hash_type value_type, HashTable *hash_table);
 HashTable *add_item_to_table(Item *item, HashTable *hash_table);
 Node *add_item_to_bin(Item *item, Node *bin_list);
 
-Item *lookup(union Hashable key, int key_type, HashTable *hash_table);
+Item *lookup(union Hashable key, hash_type key_type, HashTable *hash_table);
 
-Item *remove_item_from_table(union Hashable key, int key_type, HashTable *hash_table);
-Node *remove_item_from_bin(union Hashable key, int key_type, Node *bin_list);
+Item *remove_item_from_table(union Hashable key, hash_type key_type, HashTable *hash_table);
+Node *remove_item_from_bin(union Hashable key, hash_type key_type, Node *bin_list);
 
 HashTable *resize(HashTable *hash_table);
