@@ -40,13 +40,9 @@ static PyMemberDef Hashtable_members[] = {
 static HashTablePyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
-    int hash;
+    printf("setting\n");
     int key;
     int value;
-
-    printf("about to print table\n");
-    print_table(self->hashtable);
-    printf("printed table\n");
 
     if (!PyArg_ParseTuple(args, "iii", &hash, &key, &value))
         return NULL;
@@ -59,9 +55,6 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
 
     self->hashtable = add_item_to_table(hash, k, 0, v, 0, self->hashtable);
 
-    printf("about to print table\n");
-    print_table(self->hashtable);
-    printf("printed table\n");
 
     return self;
 }
@@ -117,7 +110,6 @@ static PyTypeObject HashTablePyType = {
 //     {NULL}  /* Sentinel */
 // };
 
-//Dealloc???
 
 #ifndef PyMODINIT_FUNC	/* declarations for DLL import/export */
 #define PyMODINIT_FUNC void
