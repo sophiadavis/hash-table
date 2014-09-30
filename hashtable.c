@@ -310,7 +310,7 @@ void free_table(HashTable *hashtable) {
     for (i = 0; i < hashtable->size; i++) {
         Node *current_node = hashtable->bin_list[i];
         while (current_node != NULL) {
-            free(current_node->item);
+            free_item(current_node->item);
             Node *temp_node = current_node->next;
             free(current_node);
             current_node = temp_node;
@@ -318,6 +318,16 @@ void free_table(HashTable *hashtable) {
     }
     free(hashtable->bin_list);
     free(hashtable);
+}
+
+void free_item(Item *item) {
+    if (item->key_type == STRING) {
+        free(item->key.str);
+    }
+    if (item->value_type == STRING) {
+        free(item->value.str);
+    }
+    free(item);
 }
 
 

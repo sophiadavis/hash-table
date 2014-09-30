@@ -4,6 +4,8 @@
 #include "hashtablemodule_helpers.h"
 
 void set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input) {
+    size_t str_size;
+    char *temp_str;
     if (PyInt_Check(input)) {
         to_set->i = PyInt_AsLong(input);
     }
@@ -12,7 +14,10 @@ void set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObj
         *type = FLOAT;
     }
     else if (PyString_Check(input)) {
-        to_set->str = PyString_AsString(input);
+        str_size = (size_t)PyString_GET_SIZE(input) + 1;
+        to_set->str = malloc(str_size);
+        temp_str = PyString_AsString(input);
+        snprintf(to_set->str, str_size, "%s", temp_str);
         *type = STRING;
     }
     else {
