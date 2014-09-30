@@ -1,9 +1,9 @@
 #include <Python.h>
 #include "structmember.h"
-#include "hashtable.h"
 #include "hashtablemodule_helpers.h"
 
-void set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input) {
+int
+set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input) {
     size_t str_size;
     char *temp_str;
     if (PyInt_Check(input)) {
@@ -22,11 +22,14 @@ void set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObj
     }
     else {
         PyErr_SetString(PyExc_TypeError, "Parameter must be integer, float, or string.");
+        return -1;
     }
+    return 0;
 }
 
 
-PyObject* format_python_return_val_from_item(Item *item) {
+PyObject*
+format_python_return_val_from_item(Item *item) {
     PyObject* return_val = NULL;
 
     if (!item) {

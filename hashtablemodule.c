@@ -1,6 +1,5 @@
 #include <Python.h>
 #include "structmember.h"
-#include "hashtable.h"
 #include "hashtablemodule_helpers.h"
 
 typedef struct {
@@ -83,8 +82,10 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     union Hashable value;
     hash_type value_type = INTEGER;
 
-    set_hashable_from_user_input(&key, &key_type, key_input);
-    set_hashable_from_user_input(&value, &value_type, value_input);
+    if ((set_hashable_from_user_input(&key, &key_type, key_input) < 0) ||
+        (set_hashable_from_user_input(&value, &value_type, value_input) < 0)) {
+            return NULL;
+    }
 
     self->hashtable = add(HUGE_VAL, key, key_type, value, value_type, self->hashtable);
     return self;
@@ -103,7 +104,9 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
     union Hashable key;
     hash_type key_type = INTEGER; // default
 
-    set_hashable_from_user_input(&key, &key_type, key_input);
+    if (set_hashable_from_user_input(&key, &key_type, key_input) < 0) {
+            return NULL;
+    }
 
     Item *item = lookup(key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
@@ -123,8 +126,10 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 
     union Hashable key;
     hash_type key_type = INTEGER; // default
-    
-    set_hashable_from_user_input(&key, &key_type, key_input);
+
+    if (set_hashable_from_user_input(&key, &key_type, key_input) < 0) {
+            return NULL;
+    }
 
     Item *item = remove_item_from_table(key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
