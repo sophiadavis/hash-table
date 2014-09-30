@@ -44,7 +44,7 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     int key;
     int value;
 
-    if (!PyArg_ParseTuple(args, "iii", &hash, &key, &value))
+    if (!PyArg_ParseTuple(args, "ii", &key, &value))
         return NULL;
 
     union Hashable k;
@@ -53,7 +53,10 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     union Hashable v;
     v.i = value;
 
-    self->hashtable = add_item_to_table(hash, k, 0, v, 0, self->hashtable);
+    self->hashtable = add(HUGE_VAL, k, INTEGER, v, INTEGER, self->hashtable);
+    return self;
+}
+
 
 
     return self;
