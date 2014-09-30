@@ -57,14 +57,29 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     return self;
 }
 
+static PyObject *
+HashTablePy_get(HashTablePyObject *self, PyObject *args)
+{
+    printf("getting\n");
+    int key;
 
+    if (!PyArg_ParseTuple(args, "i", &key))
+        return 0; // NULL
 
-    return self;
+    union Hashable k;
+    k.i = key;
+
+    Item *item = lookup(k, INTEGER, self->hashtable);
+
+    return Py_BuildValue("i", item->value.i);
 }
 
 static PyMethodDef HashTablePy_methods[] = {
     {"set", (PyCFunction)HashTablePy_set, METH_VARARGS,
      "Add a key-value pair to the hashtable."
+    },
+    {"get", (PyCFunction)HashTablePy_get, METH_VARARGS,
+     "Lookup value associated with given key in the hashtable."
     },
     {NULL}  /* Sentinel */
 };
