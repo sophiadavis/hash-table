@@ -43,7 +43,6 @@ HashTable *init(int size, float max_load_proportion);
 void print_table(HashTable *hash_table);
 void print_item(Item *item);
 void free_table(HashTable *hash_table);
-void free_item(Item *item);
 
 int calculate_hash(union Hashable key, hash_type key_type);
 int calculate_bin_index(int hash, int size);

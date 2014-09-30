@@ -310,7 +310,7 @@ void free_table(HashTable *hash_table) {
     for (i = 0; i < hash_table->size; i++) {
         Node *current_node = hash_table->bin_list[i];
         while (current_node != NULL) {
-            free_item(current_node->item);
+            free(current_node->item);
             Node *temp_node = current_node->next;
             free(current_node);
             current_node = temp_node;
@@ -318,16 +318,6 @@ void free_table(HashTable *hash_table) {
     }
     free(hash_table->bin_list);
     free(hash_table);
-}
-
-void free_item(Item *item) {
-    // if (item->key_type == STRING) {
-    //     free(item->key.str);
-    // }
-    // if (item->value_type == STRING) {
-    //     free(item->value.str);
-    // }
-    free(item);
 }
 
 
@@ -670,13 +660,17 @@ int main() {
     printf("\n~~~~~Adding %s -- %s (hash: %i)\n", str_key.str, str_value.str, calculate_hash(str_key, STRING));
     hash_table = add(HUGE_VAL, str_key, STRING, str_value, STRING, hash_table);
 
-    str_key.str = malloc(50);
-    snprintf(str_key.str, 50, "чебурашка");
-    str_value.str = malloc(50);
-    snprintf(str_value.str, 50, "крокодил гена");
 
-    printf("\n~~~~~Adding %s -- %s (hash: %i)\n", str_key.str, str_value.str, calculate_hash(str_key, 2));
-    hash_table = add(HUGE_VAL, str_key, STRING, str_value, STRING, hash_table);
+    union Hashable str_key2;
+    union Hashable str_value2;
+
+    str_key2.str = malloc(50);
+    snprintf(str_key2.str, 50, "чебурашка");
+    str_value2.str = malloc(50);
+    snprintf(str_value2.str, 50, "крокодил гена");
+
+    printf("\n~~~~~Adding %s -- %s (hash: %i)\n", str_key2.str, str_value2.str, calculate_hash(str_key2, 2));
+    hash_table = add(HUGE_VAL, str_key2, STRING, str_value2, STRING, hash_table);
 
     print_table(hash_table);
     // free_table(hash_table);
@@ -694,7 +688,7 @@ int main() {
     Item *removed = remove_item_from_table(key, INTEGER, hash_table);
     printf("~~~~~Got: ");
     print_item(removed);
-    free_item(removed);
+    free(removed);
 
     key.i = 2;
     printf("\n~~~~~Looking for %i (hash: %i)\n", key.i, calculate_hash(key, INTEGER));
@@ -706,7 +700,7 @@ int main() {
     removed = remove_item_from_table(key, INTEGER, hash_table);
     printf("~~~~~Got: ");
     print_item(removed);
-    free_item(removed);
+    free(removed);
 
     key.i = 3;
     printf("\n~~~~~Looking for %i (hash: %i)\n", key.i, calculate_hash(key, INTEGER));
@@ -718,7 +712,7 @@ int main() {
     removed = remove_item_from_table(key, INTEGER, hash_table);
     printf("~~~~~Got: ");
     print_item(removed);
-    free_item(removed);
+    free(removed);
 
 
     union Hashable str_key_lookup;
@@ -735,23 +729,23 @@ int main() {
     removed = remove_item_from_table(str_key_lookup, STRING, hash_table);
     printf("~~~~~Got: ");
     print_item(removed);
-    free_item(removed);
-    free(str_key_lookup.str);
+    free(removed);
 
-    str_key_lookup.str = malloc(50);
-    snprintf(str_key_lookup.str, 50, "чебурашка");
+    union Hashable str_key_lookup2;
 
-    printf("\n~~~~~Looking for %s (hash: %i)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
-    found = lookup(str_key_lookup, STRING, hash_table);
+    str_key_lookup2.str = malloc(50);
+    snprintf(str_key_lookup2.str, 50, "чебурашка");
+
+    printf("\n~~~~~Looking for %s (hash: %i)\n", str_key_lookup2.str, calculate_hash(str_key_lookup2, STRING));
+    found = lookup(str_key_lookup2, STRING, hash_table);
     printf("~~~~~Got: ");
     print_item(found);
 
-    printf("~~~~~Removing %s (hash: %i)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
-    removed = remove_item_from_table(str_key_lookup, STRING, hash_table);
+    printf("~~~~~Removing %s (hash: %i)\n", str_key_lookup2.str, calculate_hash(str_key_lookup2, STRING));
+    removed = remove_item_from_table(str_key_lookup2, STRING, hash_table);
     printf("~~~~~Got: ");
     print_item(removed);
-    free_item(removed);
-    free(str_key_lookup.str);
+    free(removed);
 
     printf("\n~~~~~Looking for %s (hash: %i)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
     found = lookup(str_key_lookup, STRING, hash_table);
@@ -760,6 +754,13 @@ int main() {
 
     print_table(hash_table);
     free_table(hash_table);
+
+    free(str_key.str);
+    free(str_value.str);
+    free(str_key_lookup.str);
+    free(str_key_lookup2.str);
+    free(str_key2.str);
+    free(str_value2.str);
 
     return 0;
 }
