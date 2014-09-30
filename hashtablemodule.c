@@ -5,36 +5,38 @@
 typedef struct {
     PyObject_HEAD
     HashTable *hashtable;
+    int size;
+    float max_load;
 } HashTablePyObject;
 
 static int
 HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 {
-    // int *value = NULL;
-    // PyObject *next = NULL;
-    // PyObject *tmp;
-    //
-    // static char *kwlist[] = {"value", "next", NULL};
-    //
-    // if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-    //                                   &value, &next))
-    //     return -1;
-    //
-    // if (value) {
-    //     self->value = *value;
-    // }
-    //
-    // if (next) {
-    //     tmp = self->next;
-    //     Py_INCREF(next);
-    //     self->next = next;
-    //     Py_XDECREF(tmp);
-    // }
-    self->hashtable = init(4, 0.5);
+    int size = 4;
+    float max_load = 0.5;
+
+    static char *kwlist[] = {"size", "max_load", NULL};
+
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|if", kwlist, &size, &max_load)) {
+        printf("Invalid size and max load proportion. Using defaults.\n");
+    }
+
+    printf("Size and max load proportion: %i, %f\n", size, max_load);
+
+    self->hashtable = init(size, max_load);
+    self->size = size;
+    self->max_load = max_load;
 
     return 0;
 }
 
+static PyMemberDef Hashtable_members[] = {
+    {"size", T_INT, offsetof(HashTablePyObject, size), 0,
+     "Current number of bins in hashtable."},
+    {"max_load", T_FLOAT, offsetof(HashTablePyObject, max_load), 0,
+     "Maximum proportion of number of items to number of bins before resizing."},
+    {NULL}  /* Sentinel */
+};
 static HashTablePyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
@@ -93,7 +95,7 @@ static PyTypeObject HashTablePyType = {
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "HashTable objects",       /* tp_doc */
+    "Customizeable HashTable!",       /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
     0,		               /* tp_richcompare */
@@ -101,7 +103,7 @@ static PyTypeObject HashTablePyType = {
     0,		               /* tp_iter */
     0,		               /* tp_iternext */
     HashTablePy_methods,    /* tp_methods */
-    0,             /* tp_members */
+    Hashtable_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
