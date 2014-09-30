@@ -13,13 +13,24 @@ typedef struct {
 static int
 HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 {
+    self->hashtable = NULL;
+
     int size = 4;
     float max_load = 0.5;
 
     static char *kwlist[] = {"size", "max_load", NULL};
 
     if (! PyArg_ParseTupleAndKeywords(args, kwds, "|if", kwlist, &size, &max_load)) {
-        printf("Invalid size and max load proportion. Using defaults.\n");
+        PyErr_SetString(PyExc_TypeError, "Invalid parameters.");
+        return -1;
+    }
+    if (size <= 0) {
+        PyErr_SetString(PyExc_TypeError, "size parameter must be a positive integer.");
+        return -1;
+    }
+    if ((max_load <= 0) || (max_load > 1.0)) {
+        PyErr_SetString(PyExc_TypeError, "max_load parameter must be a float between 0.0 and 1.0.");
+        return -1;
     }
 
     printf("Size and max load proportion: %i, %f\n", size, max_load);
@@ -43,7 +54,9 @@ static void
 HashTablePyObject_dealloc(HashTablePyObject* self)
 {
     printf("~~~~~~~~~~~~Dealloc-ing~~~~~~~~~~~~\n");
-    self->ob_type->tp_free((PyObject*)self);
+    if (! (self->hashtable == NULL)) {
+        self->ob_type->tp_free((PyObject*)self);
+    }
 }
 
 static void
