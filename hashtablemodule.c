@@ -98,20 +98,23 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
     return return_val;
 }
 
+static PyObject *
+HashTablePy_pop(HashTablePyObject *self, PyObject *args)
+{
+    printf("popping\n");
 
-    switch(item->value_type) {
-        case INTEGER:
-            return_val = Py_BuildValue("i", item->value.i);
-            break;
-        case FLOAT:
-            return_val = Py_BuildValue("f", item->value.f);
-            break;
-        case STRING:
-            return_val = Py_BuildValue("s", item->value.str);
-            break;
-        default:
-            Py_RETURN_NONE;
-    }
+    PyObject* key_input = NULL;
+
+    if (!PyArg_ParseTuple(args, "O", &key_input))
+        return NULL;
+
+    union Hashable key;
+    hash_type key_type = INTEGER; // default
+    
+    set_hashable_from_user_input(&key, &key_type, key_input);
+
+    Item *item = remove_item_from_table(key, key_type, self->hashtable);
+    PyObject* return_val = format_python_return_val_from_item(item);
 
     return return_val;
 }
@@ -129,6 +132,8 @@ static PyMethodDef HashTablePy_methods[] = {
     {"get", (PyCFunction)HashTablePy_get, METH_VARARGS,
      "Lookup the value associated with the given key in the hashtable."
     },
+    {"pop", (PyCFunction)HashTablePy_pop, METH_VARARGS,
+     "Delete the key-value pair associated with given key from the hashtable. The value is returned."
     },
     {NULL}  /* Sentinel */
 };
