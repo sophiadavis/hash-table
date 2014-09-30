@@ -37,10 +37,26 @@ static PyMemberDef Hashtable_members[] = {
      "Maximum proportion of number of items to number of bins before resizing."},
     {NULL}  /* Sentinel */
 };
+
+static void
+HashTablePyObject_dealloc(HashTablePyObject* self)
+{
+    printf("~~~~~~~~~~~~Dealloc-ing~~~~~~~~~~~~\n");
+    self->ob_type->tp_free((PyObject*)self);
+}
+
+static void
+HashTablePyObject_free(HashTablePyObject* self)
+{
+    printf("~~~~~~~~~~~~Free-ing~~~~~~~~~~~~\n");
+    free_table(self->hashtable);
+}
+
 static HashTablePyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
     printf("setting\n");
+    Py_INCREF(self);
     int key;
     int value;
 
@@ -90,7 +106,7 @@ static PyTypeObject HashTablePyType = {
     "hashtable.HashTable",             /*tp_name*/
     sizeof(HashTablePyObject), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/
+    (destructor)HashTablePyObject_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -122,6 +138,9 @@ static PyTypeObject HashTablePyType = {
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
     (initproc)HashTablePyObject_init,      /* tp_init */
+    0,                          /* tp_alloc */
+    0, //newfunc tp_new;
+    (freefunc)HashTablePyObject_free, //tp_free; /* Low-level free-memory routine */
 };
 
 // static PyMethodDef module_methods[] = {
