@@ -321,12 +321,12 @@ void free_table(HashTable *hash_table) {
 }
 
 void free_item(Item *item) {
-    if (item->key_type == STRING) {
-        free(item->key.str);
-    }
-    if (item->value_type == STRING) {
-        free(item->value.str);
-    }
+    // if (item->key_type == STRING) {
+    //     free(item->key.str);
+    // }
+    // if (item->value_type == STRING) {
+    //     free(item->value.str);
+    // }
     free(item);
 }
 

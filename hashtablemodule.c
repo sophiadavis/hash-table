@@ -57,19 +57,49 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
     printf("setting\n");
     Py_INCREF(self);
-    int key;
-    int value;
 
-    if (!PyArg_ParseTuple(args, "ii", &key, &value))
+    union Hashable key;
+    hash_type key_type = INTEGER; // default
+    union Hashable value;
+    hash_type value_type = INTEGER;
+
+    PyObject* key_input = NULL;
+    PyObject* value_input = NULL;
+
+    if (!PyArg_ParseTuple(args, "OO", &key_input, &value_input))
         return NULL;
 
-    union Hashable k;
-    k.i = key;
+    if (PyInt_Check(key_input)) {
+        key.i = PyInt_AsLong(key_input);
+    }
+    else if (PyFloat_Check(key_input)) {
+        key.f = PyFloat_AsDouble(key_input);
+        key_type = FLOAT;
+    }
+    else if (PyString_Check(key_input)) {
+        key.str = PyString_AsString(key_input);
+        key_type = STRING;
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Key must be integer, float, or string.");
+    }
 
-    union Hashable v;
-    v.i = value;
+    if (PyInt_Check(value_input)) {
+        value.i = PyInt_AsLong(value_input);
+    }
+    else if (PyFloat_Check(value_input)) {
+        value.f = PyFloat_AsDouble(value_input);
+        value_type = FLOAT;
+    }
+    else if (PyString_Check(value_input)) {
+        value.str = PyString_AsString(value_input);
+        value_type = STRING;
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Value must be integer, float, or string.");
+    }
 
-    self->hashtable = add(HUGE_VAL, k, INTEGER, v, INTEGER, self->hashtable);
+    self->hashtable = add(HUGE_VAL, key, key_type, value, value_type, self->hashtable);
     return self;
 }
 
@@ -77,18 +107,54 @@ static PyObject *
 HashTablePy_get(HashTablePyObject *self, PyObject *args)
 {
     printf("getting\n");
-    int key;
+    union Hashable key;
+    hash_type key_type = INTEGER; // default
 
-    if (!PyArg_ParseTuple(args, "i", &key))
-        return 0; // NULL
+    PyObject* key_input = NULL;
 
-    union Hashable k;
-    k.i = key;
+    if (!PyArg_ParseTuple(args, "O", &key_input))
+        return NULL;
 
-    Item *item = lookup(k, INTEGER, self->hashtable);
+    if (PyInt_Check(key_input)) {
+        key.i = PyInt_AsLong(key_input);
+    }
+    else if (PyFloat_Check(key_input)) {
+        key.f = PyFloat_AsDouble(key_input);
+        key_type = FLOAT;
+    }
+    else if (PyString_Check(key_input)) {
+        key.str = PyString_AsString(key_input);
+        key_type = STRING;
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Key must be integer, float, or string.");
+    }
 
-    return Py_BuildValue("i", item->value.i);
+    Item *item = lookup(key, key_type, self->hashtable);
+
+    PyObject* return_val = NULL;
+
+    if (!item) {
+        Py_RETURN_NONE;
+    }
+
+    switch(item->value_type) {
+        case INTEGER:
+            return_val = Py_BuildValue("i", item->value.i);
+            break;
+        case FLOAT:
+            return_val = Py_BuildValue("f", item->value.f);
+            break;
+        case STRING:
+            return_val = Py_BuildValue("s", item->value.str);
+            break;
+        default:
+            Py_RETURN_NONE;
+    }
+
+    return return_val;
 }
+
 static int
 HashTablePy_print(HashTablePyObject *self, PyObject *args) {
     print_table(self->hashtable);
