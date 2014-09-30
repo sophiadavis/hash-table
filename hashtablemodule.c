@@ -89,6 +89,11 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
 
     return Py_BuildValue("i", item->value.i);
 }
+static int
+HashTablePy_print(HashTablePyObject *self, PyObject *args) {
+    print_table(self->hashtable);
+    return 0;
+}
 
 static PyMethodDef HashTablePy_methods[] = {
     {"set", (PyCFunction)HashTablePy_set, METH_VARARGS,
@@ -107,7 +112,7 @@ static PyTypeObject HashTablePyType = {
     sizeof(HashTablePyObject), /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)HashTablePyObject_dealloc, /*tp_dealloc*/
-    0,                         /*tp_print*/
+    (printfunc)HashTablePy_print,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
@@ -139,8 +144,8 @@ static PyTypeObject HashTablePyType = {
     0,                         /* tp_dictoffset */
     (initproc)HashTablePyObject_init,      /* tp_init */
     0,                          /* tp_alloc */
-    0, //newfunc tp_new;
-    (freefunc)HashTablePyObject_free, //tp_free; /* Low-level free-memory routine */
+    0,                          /* tp_new */
+    (freefunc)HashTablePyObject_free, /* tp_free */
 };
 
 // static PyMethodDef module_methods[] = {
