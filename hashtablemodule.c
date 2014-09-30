@@ -1,6 +1,7 @@
 #include <Python.h>
 #include "structmember.h"
 #include "hashtable.h"
+#include "hashtablemodule_helpers.h"
 
 typedef struct {
     PyObject_HEAD
@@ -58,46 +59,19 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     printf("setting\n");
     Py_INCREF(self);
 
-    union Hashable key;
-    hash_type key_type = INTEGER; // default
-    union Hashable value;
-    hash_type value_type = INTEGER;
-
     PyObject* key_input = NULL;
     PyObject* value_input = NULL;
 
     if (!PyArg_ParseTuple(args, "OO", &key_input, &value_input))
         return NULL;
 
-    if (PyInt_Check(key_input)) {
-        key.i = PyInt_AsLong(key_input);
-    }
-    else if (PyFloat_Check(key_input)) {
-        key.f = PyFloat_AsDouble(key_input);
-        key_type = FLOAT;
-    }
-    else if (PyString_Check(key_input)) {
-        key.str = PyString_AsString(key_input);
-        key_type = STRING;
-    }
-    else {
-        PyErr_SetString(PyExc_TypeError, "Key must be integer, float, or string.");
-    }
+    union Hashable key;
+    hash_type key_type = INTEGER; // default
+    union Hashable value;
+    hash_type value_type = INTEGER;
 
-    if (PyInt_Check(value_input)) {
-        value.i = PyInt_AsLong(value_input);
-    }
-    else if (PyFloat_Check(value_input)) {
-        value.f = PyFloat_AsDouble(value_input);
-        value_type = FLOAT;
-    }
-    else if (PyString_Check(value_input)) {
-        value.str = PyString_AsString(value_input);
-        value_type = STRING;
-    }
-    else {
-        PyErr_SetString(PyExc_TypeError, "Value must be integer, float, or string.");
-    }
+    set_hashable_from_user_input(&key, &key_type, key_input);
+    set_hashable_from_user_input(&value, &value_type, value_input);
 
     self->hashtable = add(HUGE_VAL, key, key_type, value, value_type, self->hashtable);
     return self;
@@ -107,36 +81,23 @@ static PyObject *
 HashTablePy_get(HashTablePyObject *self, PyObject *args)
 {
     printf("getting\n");
-    union Hashable key;
-    hash_type key_type = INTEGER; // default
 
     PyObject* key_input = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &key_input))
         return NULL;
 
-    if (PyInt_Check(key_input)) {
-        key.i = PyInt_AsLong(key_input);
-    }
-    else if (PyFloat_Check(key_input)) {
-        key.f = PyFloat_AsDouble(key_input);
-        key_type = FLOAT;
-    }
-    else if (PyString_Check(key_input)) {
-        key.str = PyString_AsString(key_input);
-        key_type = STRING;
-    }
-    else {
-        PyErr_SetString(PyExc_TypeError, "Key must be integer, float, or string.");
-    }
+    union Hashable key;
+    hash_type key_type = INTEGER; // default
+
+    set_hashable_from_user_input(&key, &key_type, key_input);
 
     Item *item = lookup(key, key_type, self->hashtable);
+    PyObject* return_val = format_python_return_val_from_item(item);
 
-    PyObject* return_val = NULL;
+    return return_val;
+}
 
-    if (!item) {
-        Py_RETURN_NONE;
-    }
 
     switch(item->value_type) {
         case INTEGER:
@@ -166,7 +127,8 @@ static PyMethodDef HashTablePy_methods[] = {
      "Add a key-value pair to the hashtable."
     },
     {"get", (PyCFunction)HashTablePy_get, METH_VARARGS,
-     "Lookup value associated with given key in the hashtable."
+     "Lookup the value associated with the given key in the hashtable."
+    },
     },
     {NULL}  /* Sentinel */
 };
