@@ -12,7 +12,7 @@ set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* 
     }
     else if (PyFloat_Check(input)) {
         to_set->f = PyFloat_AsDouble(input);
-        *type = FLOAT;
+        *type = DOUBLE;
     }
     else if (PyString_Check(input)) {
         str_size = (size_t)PyString_GET_SIZE(input) + 1;
@@ -42,7 +42,7 @@ format_python_return_val_from_item(Item *item)
         case INTEGER:
             return_val = Py_BuildValue("i", item->value.i);
             break;
-        case FLOAT:
+        case DOUBLE:
             return_val = Py_BuildValue("f", item->value.f);
             break;
         case STRING:

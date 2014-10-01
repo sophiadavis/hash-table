@@ -5,8 +5,8 @@
 typedef struct {
     PyObject_HEAD
     HashTable *hashtable;
-    int size;
-    float max_load;
+    long int size;
+    double max_load;
 } HashTablePyObject;
 
 static int
@@ -14,8 +14,8 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 {
     self->hashtable = NULL;
 
-    int size = 4;
-    float max_load = 0.5;
+    long int size = 4;
+    double max_load = 0.5;
 
     static char *kwlist[] = {"size", "max_load", NULL};
 
@@ -32,7 +32,8 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
 
-    printf("Size and max load proportion: %i, %f\n", size, max_load);
+    printf("Size and max load proportion: %li, %f\n", size, max_load);
+
 
     self->hashtable = init(size, max_load);
     self->size = size;
