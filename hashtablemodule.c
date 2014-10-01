@@ -42,9 +42,9 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 }
 
 static PyMemberDef Hashtable_members[] = {
-    {"size", T_INT, offsetof(HashTablePyObject, size), 0,
+    {"size", T_INT, offsetof(HashTablePyObject, size), READONLY,
      "Current number of bins in hashtable."},
-    {"max_load", T_FLOAT, offsetof(HashTablePyObject, max_load), 0,
+    {"max_load", T_FLOAT, offsetof(HashTablePyObject, max_load), READONLY,
      "Maximum proportion of number of items to number of bins before resizing."},
     {NULL}  /* Sentinel */
 };
