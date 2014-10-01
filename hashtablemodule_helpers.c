@@ -2,6 +2,14 @@
 #include "structmember.h"
 #include "hashtablemodule_helpers.h"
 
+void
+free_hashable(union Hashable hashable, hash_type type)
+{
+    if (type == STRING) {
+        free(hashable->str);
+    }
+}
+
 int
 set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input)
 {
