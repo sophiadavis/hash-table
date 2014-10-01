@@ -189,6 +189,15 @@ HashTablePy_print(HashTablePyObject *self, PyObject *args)
     return 0;
 }
 
+static PyObject *
+HashTablePy_repr(HashTablePyObject *self, PyObject *args)
+{
+    char *repr = stringify_table(self->hashtable);
+    PyObject* py_repr = Py_BuildValue("s", repr);
+    free(repr);
+    return py_repr;
+}
+
 static PyMethodDef HashTablePy_methods[] = {
     {"set", (PyCFunction)HashTablePy_set, METH_VARARGS,
      "Add a key-value pair to the hashtable."
@@ -213,7 +222,7 @@ static PyTypeObject HashTablePyType = {
     0,                                           /* tp_getattr */
     0,                                           /* tp_setattr */
     0,                                           /* tp_compare */
-    0,                                           /* tp_repr */
+    (reprfunc)HashTablePy_repr,                  /* tp_repr */
     0,                                           /* tp_as_number */
     0,                                           /* tp_as_sequence */
     0,                                           /* tp_as_mapping */

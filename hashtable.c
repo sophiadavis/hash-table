@@ -262,7 +262,12 @@ HashTable *resize(HashTable *old_hashtable) {
 * Helper functions to print hashtables and data items
 ***/
 void print_table(HashTable *hashtable) {
-    printf("\n********************\n--------HashTable--------\n-Array size: %li -Load: %li -Max Load Prop: %f -Current Load Prop: %f\n", hashtable->size, hashtable->load, hashtable->max_load_proportion, ((double)hashtable->load / (double)hashtable->size));
+    printf("\n********************\n--------HashTable--------\n-Array size: "
+           "%li -Load: %li -Max Load Prop: %f -Current Load Prop: %f\n",
+           hashtable->size,
+           hashtable->load,
+           hashtable->max_load_proportion,
+           ((double)hashtable->load / (double)hashtable->size));
 
     long int i;
     for (i = 0; i < hashtable->size; i++) {
@@ -312,6 +317,77 @@ void print_item(Item *item) {
         }
         printf("------\n");
     }
+}
+
+char *stringify_table(HashTable *hashtable) {
+    int max_len = 200 + 200 * hashtable->load; // a guess
+    int len = 0;
+    char *hashtable_string = malloc(max_len);
+    char *item_string;
+
+    len = len + snprintf(hashtable_string, max_len,
+        "\n********************\n--------HashTable--------\n-Array size: "
+        "%li -Load: %li -Max Load Prop: %f -Current Load Prop: %f\n",
+        hashtable->size,
+        hashtable->load,
+        hashtable->max_load_proportion,
+        ((double)hashtable->load / (double)hashtable->size));
+
+    long int i;
+    for (i = 0; i < hashtable->size; i++) {
+        len = len + snprintf(hashtable_string + len, max_len - len, "*Bin %li\n", i);
+        Node *current_node = hashtable->bin_list[i];
+        if (current_node == NULL) {
+            len = len + snprintf(hashtable_string + len, max_len - len, "(empty)\n");
+        }
+        else {
+            while (current_node != NULL) {
+                item_string = stringify_item(current_node->item);
+                len = len + snprintf(hashtable_string + len, max_len - len, "%s", item_string);
+                free(item_string);
+                current_node = current_node->next;
+            }
+        }
+    }
+    len = len + snprintf(hashtable_string + len, max_len - len, "********************\n");
+    return hashtable_string;
+}
+
+char *stringify_item(Item *item) {
+    int max_len = 200;
+    int len = 0;
+    char *item_string = malloc(max_len);
+    if (item == NULL) {
+        len = len + snprintf(item_string + len, max_len - len, "------NULL\n");
+    }
+    else {
+        len = len + snprintf(item_string + len, max_len - len, "---------Hash: %li---Key: ", item->hash);
+        switch (item->key_type) {
+            case INTEGER:
+                len = len + snprintf(item_string + len, max_len - len, "%li", item->key.i);
+                break;
+            case DOUBLE:
+                len = len + snprintf(item_string + len, max_len - len, "%f", item->key.f);
+                break;
+            case STRING:
+                len = len + snprintf(item_string + len, max_len - len, "%s", item->key.str);
+                break;
+        }
+        len = len + snprintf(item_string + len, max_len - len, "---Value: ");
+        switch (item->value_type) {
+            case INTEGER:
+                len = len + snprintf(item_string + len, max_len - len, "%li", item->value.i);
+                break;
+            case DOUBLE:
+                len = len + snprintf(item_string + len, max_len - len, "%f", item->value.f);
+                break;
+            case STRING:
+                len = len + snprintf(item_string + len, max_len - len, "%s", item->value.str);
+                break;
+        }
+        len = len + snprintf(item_string + len, max_len - len, "------\n");
+    }
+    return item_string;
 }
 
 void free_table(HashTable *hashtable) {
