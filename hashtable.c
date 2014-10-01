@@ -282,9 +282,6 @@ void print_item(Item *item) {
             case STRING:
                 printf("%s", item->key.str);
                 break;
-            default:
-                printf("oops");
-                break;
         }
         printf("---Value: ");
         switch (item->value_type) {
@@ -296,9 +293,6 @@ void print_item(Item *item) {
                 break;
             case STRING:
                 printf("%s", item->value.str);
-                break;
-            default:
-                printf("oops");
                 break;
         }
         printf("------\n");
