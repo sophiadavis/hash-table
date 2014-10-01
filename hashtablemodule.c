@@ -45,11 +45,9 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
     self->max_load = max_load;
 
     if (hash_func == NULL) {
-        printf("NULLLLLLLL!\n");
         hash_func = default_py_hash_funcs();
     }
 
-    printf("it's callable? %i\n", PyCallable_Check(hash_func));
     self->hash_func = hash_func;
 
     Py_INCREF(self->hash_func);
@@ -62,6 +60,8 @@ static PyMemberDef Hashtable_members[] = {
      "Current number of bins in hashtable."},
     {"max_load", T_FLOAT, offsetof(HashTablePyObject, max_load), READONLY,
      "Maximum proportion of number of items to number of bins before resizing."},
+     {"hash_func", T_FLOAT, offsetof(HashTablePyObject, hash_func), READONLY,
+      "Hash function used to calculate."},
     {NULL}  /* Sentinel */
 };
 
@@ -109,8 +109,6 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
         // TODO free stuff?
         return NULL;
     }
-
-    printf("hash is %li\n", hash);
 
     self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
     return self;

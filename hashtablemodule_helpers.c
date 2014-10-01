@@ -86,7 +86,6 @@ get_hash(union Hashable key, hash_type type, PyObject *hash_func)
     }
 
     hash = PyInt_AsLong(py_hash);
-    printf("hash is %li\n", hash);
     Py_DECREF(py_hash);
 
     return hash;
