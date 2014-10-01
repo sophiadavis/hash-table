@@ -111,6 +111,10 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
     Item *item = lookup(key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
 
+    if (key_type == STRING) {
+        free(key.str);
+    }
+
     return return_val;
 }
 
@@ -133,6 +137,10 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 
     Item *item = remove_item_from_table(key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
+
+    if (key_type == STRING) {
+        free(key.str);
+    }
 
     return return_val;
 }
