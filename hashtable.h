@@ -52,7 +52,7 @@ int hashable_equal(union Hashable h1, hash_type type1, union Hashable h2, hash_t
 
 HashTable *add(long int hash, union Hashable key, hash_type key_type, union Hashable value, hash_type value_type, HashTable *hashtable);
 HashTable *add_item_to_table(Item *item, HashTable *hashtable);
-Node *add_item_to_bin(Item *item, Node *bin_list);
+Node *add_item_to_bin(Item *item, Node *bin_list, HashTable *hashtable);
 
 Item *lookup_by_hash(long int hash, union Hashable key, hash_type key_type, HashTable *hashtable);
 Item *lookup(union Hashable key, hash_type key_type, HashTable *hashtable);

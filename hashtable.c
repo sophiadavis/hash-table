@@ -108,9 +108,8 @@ HashTable *add_item_to_table(Item *item, HashTable *hashtable) {
     int bin_index = calculate_bin_index(item->hash, hashtable->size);
 
     Node *bin_list = hashtable->bin_list[bin_index];
-    hashtable->bin_list[bin_index] = add_item_to_bin(item, bin_list);
+    hashtable->bin_list[bin_index] = add_item_to_bin(item, bin_list, hashtable);
 
-    hashtable->load++;
     return hashtable;
 }
 
@@ -118,7 +117,7 @@ HashTable *add_item_to_table(Item *item, HashTable *hashtable) {
 * Adds item to the linked list at the given bin
 *   If the new item has the same key as an existing item, the value is updated.
 ***/
-Node *add_item_to_bin(Item *item, Node *bin_list) {
+Node *add_item_to_bin(Item *item, Node *bin_list, HashTable *hashtable) {
     Node *head = bin_list;
     Node *prev_node;
     Node *current_node = bin_list;
@@ -126,6 +125,7 @@ Node *add_item_to_bin(Item *item, Node *bin_list) {
         Node *new = malloc(sizeof(Node));
         new->item = item;
         new->next = current_node;
+        hashtable->load++;
         return new;
     }
     else {
@@ -142,6 +142,7 @@ Node *add_item_to_bin(Item *item, Node *bin_list) {
         new->item = item;
         new->next = current_node;
         prev_node->next = new;
+        hashtable->load++;
         return head;
     }
 }
