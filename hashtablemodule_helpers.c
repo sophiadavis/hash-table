@@ -6,7 +6,7 @@ void
 free_hashable(union Hashable hashable, hash_type type)
 {
     if (type == STRING) {
-        free(hashable->str);
+        free(hashable.str);
     }
 }
 
@@ -85,7 +85,6 @@ get_hash(union Hashable key, hash_type type, PyObject *hash_func)
     }
 
     py_hash = PyObject_CallObject(hash_func, py_key_arg);
-    printf("Here is the tuple: %s\n", PyString_AsString(py_key_arg->ob_type->tp_repr(py_key_arg)));
     Py_DECREF(py_key_arg);
 
     if ((py_hash == NULL) || (! PyInt_Check(py_hash))) {
