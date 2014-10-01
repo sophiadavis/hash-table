@@ -60,8 +60,8 @@ static PyMemberDef Hashtable_members[] = {
      "Current number of bins in hashtable."},
     {"max_load", T_FLOAT, offsetof(HashTablePyObject, max_load), READONLY,
      "Maximum proportion of number of items to number of bins before resizing."},
-     {"hash_func", T_FLOAT, offsetof(HashTablePyObject, hash_func), READONLY,
-      "Hash function used to calculate."},
+     {"hash_func", T_OBJECT, offsetof(HashTablePyObject, hash_func), READONLY,
+      "Hash function used to determine which bin a key-value pair should be stored in."},
     {NULL}  /* Sentinel */
 };
 
