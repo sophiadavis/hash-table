@@ -132,7 +132,9 @@ Node *add_item_to_bin(Item *item, Node *bin_list, HashTable *hashtable) {
         while (current_node != NULL) {
             Item *current_item = current_node->item;
             if (hashable_equal(current_item->key, current_item->key_type, item->key, item->key_type)) {
-                current_item->value = item->value;
+                // keys are equal -- replace
+                free_item(current_item);
+                current_node->item = item;
                 return head;
             }
             prev_node = current_node;
@@ -684,7 +686,7 @@ int main() {
     //
     // print_table(hashtable);
 
-    printf("~~~~~~~~~~~~~~~ Testing Freeing Memory ~~~~~~~~~~~~~~~\n");
+    // printf("~~~~~~~~~~~~~~~ Testing Freeing Memory ~~~~~~~~~~~~~~~\n");
 
     // make a hashtable and free it -- no memory leaks
     // HashTable *hashtable = init(4, 0.5);
@@ -722,140 +724,169 @@ int main() {
     // print_table(hashtable);
     // free_table(hashtable);
 
-    /*
-    * test adding enough to resize and freeing -- no memory leaks
-    */
+    // /*
+    // * test adding enough to resize and freeing -- no memory leaks
+    // */
+    // HashTable *hashtable = init(4, 0.5);
+    // union Hashable key;
+    // union Hashable value;
+    //
+    // key.i = 0;
+    // value.i = 0;
+    // printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
+    // hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
+    //
+    // key.i = 3;
+    // value.i = 3;
+    // printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
+    // hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
+    //
+    // key.i = 2;
+    // value.i = 2;
+    // printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
+    // hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
+    //
+    // union Hashable str_key;
+    // union Hashable str_value;
+    //
+    // str_key.str = malloc(50);
+    // snprintf(str_key.str, 50, "hello");
+    // str_value.str = malloc(50);
+    // snprintf(str_value.str, 50, "world");
+    //
+    // printf("\n~~~~~Adding %s -- %s (hash: %li)\n", str_key.str, str_value.str, calculate_hash(str_key, STRING));
+    // hashtable = add(HUGE_VAL, str_key, STRING, str_value, STRING, hashtable);
+    //
+    //
+    // union Hashable str_key2;
+    // union Hashable str_value2;
+    //
+    // str_key2.str = malloc(50);
+    // snprintf(str_key2.str, 50, "чебурашка");
+    // str_value2.str = malloc(50);
+    // snprintf(str_value2.str, 50, "крокодил гена");
+    //
+    // printf("\n~~~~~Adding %s -- %s (hash: %li)\n", str_key2.str, str_value2.str, calculate_hash(str_key2, 2));
+    // hashtable = add(HUGE_VAL, str_key2, STRING, str_value2, STRING, hashtable);
+    //
+    // print_table(hashtable);
+    // // free_table(hashtable);
+    //
+    // /*
+    // * test lookup and removal -- no memory leaks (use dictionary from previous test)
+    // */
+    // key.i = 0;
+    // printf("\n~~~~~Looking for %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
+    // Item *found = lookup(key, INTEGER, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(found);
+    //
+    // printf("~~~~~Removing %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
+    // Item *removed = remove_item_from_table(key, INTEGER, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(removed);
+    // free(removed);
+    //
+    // key.i = 2;
+    // printf("\n~~~~~Looking for %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
+    // found = lookup(key, INTEGER, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(found);
+    //
+    // printf("~~~~~Removing %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
+    // removed = remove_item_from_table(key, INTEGER, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(removed);
+    // free(removed);
+    //
+    // key.i = 3;
+    // printf("\n~~~~~Looking for %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
+    // found = lookup(key, INTEGER, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(found);
+    //
+    // printf("~~~~~Removing %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
+    // removed = remove_item_from_table(key, INTEGER, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(removed);
+    // free(removed);
+    //
+    //
+    // union Hashable str_key_lookup;
+    //
+    // str_key_lookup.str = malloc(50);
+    // snprintf(str_key_lookup.str, 50, "hello");
+    //
+    // printf("\n~~~~~Looking for %s (hash: %li)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
+    // found = lookup(str_key_lookup, STRING, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(found);
+    //
+    // printf("~~~~~Removing %s (hash: %li)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
+    // removed = remove_item_from_table(str_key_lookup, STRING, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(removed);
+    // free(removed);
+    //
+    // union Hashable str_key_lookup2;
+    //
+    // str_key_lookup2.str = malloc(50);
+    // snprintf(str_key_lookup2.str, 50, "чебурашка");
+    //
+    // printf("\n~~~~~Looking for %s (hash: %li)\n", str_key_lookup2.str, calculate_hash(str_key_lookup2, STRING));
+    // found = lookup(str_key_lookup2, STRING, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(found);
+    //
+    // printf("~~~~~Removing %s (hash: %li)\n", str_key_lookup2.str, calculate_hash(str_key_lookup2, STRING));
+    // removed = remove_item_from_table(str_key_lookup2, STRING, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(removed);
+    // free(removed);
+    //
+    // printf("\n~~~~~Looking for %s (hash: %li)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
+    // found = lookup(str_key_lookup, STRING, hashtable);
+    // printf("~~~~~Got: ");
+    // print_item(found);
+    //
+    // print_table(hashtable);
+    // free_table(hashtable);
+    //
+    // free(str_key.str);
+    // free(str_value.str);
+    // free(str_key_lookup.str);
+    // free(str_key_lookup2.str);
+    // free(str_key2.str);
+    // free(str_value2.str);
+
     HashTable *hashtable = init(4, 0.5);
     union Hashable key;
     union Hashable value;
 
     key.i = 0;
     value.i = 0;
+
     printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
     hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
-
-    key.i = 3;
-    value.i = 3;
-    printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
-    hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
-
-    key.i = 2;
-    value.i = 2;
-    printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
-    hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
-
-    union Hashable str_key;
-    union Hashable str_value;
-
-    str_key.str = malloc(50);
-    snprintf(str_key.str, 50, "hello");
-    str_value.str = malloc(50);
-    snprintf(str_value.str, 50, "world");
-
-    printf("\n~~~~~Adding %s -- %s (hash: %li)\n", str_key.str, str_value.str, calculate_hash(str_key, STRING));
-    hashtable = add(HUGE_VAL, str_key, STRING, str_value, STRING, hashtable);
-
-
-    union Hashable str_key2;
-    union Hashable str_value2;
-
-    str_key2.str = malloc(50);
-    snprintf(str_key2.str, 50, "чебурашка");
-    str_value2.str = malloc(50);
-    snprintf(str_value2.str, 50, "крокодил гена");
-
-    printf("\n~~~~~Adding %s -- %s (hash: %li)\n", str_key2.str, str_value2.str, calculate_hash(str_key2, 2));
-    hashtable = add(HUGE_VAL, str_key2, STRING, str_value2, STRING, hashtable);
-
     print_table(hashtable);
-    // free_table(hashtable);
 
-    /*
-    * test lookup and removal -- no memory leaks (use dictionary from previous test)
-    */
-    key.i = 0;
-    printf("\n~~~~~Looking for %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
-    Item *found = lookup(key, INTEGER, hashtable);
-    printf("~~~~~Got: ");
-    print_item(found);
-
-    printf("~~~~~Removing %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
-    Item *removed = remove_item_from_table(key, INTEGER, hashtable);
-    printf("~~~~~Got: ");
-    print_item(removed);
-    free(removed);
-
-    key.i = 2;
-    printf("\n~~~~~Looking for %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
-    found = lookup(key, INTEGER, hashtable);
-    printf("~~~~~Got: ");
-    print_item(found);
-
-    printf("~~~~~Removing %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
-    removed = remove_item_from_table(key, INTEGER, hashtable);
-    printf("~~~~~Got: ");
-    print_item(removed);
-    free(removed);
-
-    key.i = 3;
-    printf("\n~~~~~Looking for %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
-    found = lookup(key, INTEGER, hashtable);
-    printf("~~~~~Got: ");
-    print_item(found);
-
-    printf("~~~~~Removing %li (hash: %li)\n", key.i, calculate_hash(key, INTEGER));
-    removed = remove_item_from_table(key, INTEGER, hashtable);
-    printf("~~~~~Got: ");
-    print_item(removed);
-    free(removed);
-
-
-    union Hashable str_key_lookup;
-
-    str_key_lookup.str = malloc(50);
-    snprintf(str_key_lookup.str, 50, "hello");
-
-    printf("\n~~~~~Looking for %s (hash: %li)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
-    found = lookup(str_key_lookup, STRING, hashtable);
-    printf("~~~~~Got: ");
-    print_item(found);
-
-    printf("~~~~~Removing %s (hash: %li)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
-    removed = remove_item_from_table(str_key_lookup, STRING, hashtable);
-    printf("~~~~~Got: ");
-    print_item(removed);
-    free(removed);
-
-    union Hashable str_key_lookup2;
-
-    str_key_lookup2.str = malloc(50);
-    snprintf(str_key_lookup2.str, 50, "чебурашка");
-
-    printf("\n~~~~~Looking for %s (hash: %li)\n", str_key_lookup2.str, calculate_hash(str_key_lookup2, STRING));
-    found = lookup(str_key_lookup2, STRING, hashtable);
-    printf("~~~~~Got: ");
-    print_item(found);
-
-    printf("~~~~~Removing %s (hash: %li)\n", str_key_lookup2.str, calculate_hash(str_key_lookup2, STRING));
-    removed = remove_item_from_table(str_key_lookup2, STRING, hashtable);
-    printf("~~~~~Got: ");
-    print_item(removed);
-    free(removed);
-
-    printf("\n~~~~~Looking for %s (hash: %li)\n", str_key_lookup.str, calculate_hash(str_key_lookup, STRING));
-    found = lookup(str_key_lookup, STRING, hashtable);
-    printf("~~~~~Got: ");
-    print_item(found);
-
+    value.i = 10;
+    printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
+    hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
     print_table(hashtable);
+
+    value.str = malloc(10);
+    sprintf(value.str, "%s", "hello!");
+    printf("\n~~~~~Adding %li -- %s (hash: %li)\n", key.i, value.str, calculate_hash(key, INTEGER));
+    hashtable = add(HUGE_VAL, key, INTEGER, value, STRING, hashtable);
+    print_table(hashtable);
+
+    value.i = 10;
+    printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, INTEGER));
+    hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
+    print_table(hashtable);
+
     free_table(hashtable);
-
-    free(str_key.str);
-    free(str_value.str);
-    free(str_key_lookup.str);
-    free(str_key_lookup2.str);
-    free(str_key2.str);
-    free(str_value2.str);
 
     return 0;
 }
