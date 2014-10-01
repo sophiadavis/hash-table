@@ -7,6 +7,7 @@ typedef struct {
     HashTable *hashtable;
     long int size;
     double max_load;
+    PyObject *hash_func;
 } HashTablePyObject;
 
 static int
@@ -16,10 +17,11 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 
     long int size = 4;
     double max_load = 0.5;
+    PyObject *hash_func = NULL;
 
-    static char *kwlist[] = {"size", "max_load", NULL};
+    static char *kwlist[] = {"size", "max_load", "hash_func", NULL};
 
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|if", kwlist, &size, &max_load)) {
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ifO", kwlist, &size, &max_load, &hash_func)) {
         PyErr_SetString(PyExc_TypeError, "Invalid parameters.");
         return -1;
     }
@@ -31,13 +33,26 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_TypeError, "max_load parameter must be a float between 0.0 and 1.0.");
         return -1;
     }
+    if ((hash_func != NULL) && (!PyCallable_Check(hash_func))) {
+        PyErr_SetString(PyExc_TypeError, "hash_func must be callable");
+        return -1;
+    }
 
     printf("Size and max load proportion: %li, %f\n", size, max_load);
-
 
     self->hashtable = init(size, max_load);
     self->size = size;
     self->max_load = max_load;
+
+    if (hash_func == NULL) {
+        printf("NULLLLLLLL!\n");
+        hash_func = default_py_hash_funcs();
+    }
+
+    printf("it's callable? %i\n", PyCallable_Check(hash_func));
+    self->hash_func = hash_func;
+
+    Py_INCREF(self->hash_func);
 
     return 0;
 }
@@ -88,7 +103,16 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
             return NULL;
     }
 
-    self->hashtable = add(HUGE_VAL, key, key_type, value, value_type, self->hashtable);
+    long int hash = get_hash(key, key_type, self->hash_func);
+    if (hash == (long int)HUGE_VAL) {
+        printf("error!");
+        // TODO free stuff?
+        return NULL;
+    }
+
+    printf("hash is %li\n", hash);
+
+    self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
     return self;
 }
 
@@ -109,7 +133,14 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
             return NULL;
     }
 
-    Item *item = lookup(key, key_type, self->hashtable);
+    long int hash = get_hash(key, key_type, self->hash_func);
+    if (hash == (long int)HUGE_VAL) {
+        printf("error!");
+        // TODO free stuff?
+        return NULL;
+    }
+
+    Item *item = lookup_by_hash(hash, key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
 
     if (key_type == STRING) {
@@ -136,7 +167,14 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
             return NULL;
     }
 
-    Item *item = remove_item_from_table(key, key_type, self->hashtable);
+    long int hash = get_hash(key, key_type, self->hash_func);
+    if (hash == (long int)HUGE_VAL) {
+        printf("error!");
+        // TODO free stuff?
+        return NULL;
+    }
+
+    Item *item = remove_item_from_table_by_hash(hash, key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
 
     if (key_type == STRING) {

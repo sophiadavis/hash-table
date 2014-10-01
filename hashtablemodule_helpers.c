@@ -53,3 +53,55 @@ format_python_return_val_from_item(Item *item)
     }
     return return_val;
 }
+
+long int
+get_hash(union Hashable key, hash_type type, PyObject *hash_func)
+{
+    PyObject *py_key_arg;
+    PyObject *py_hash;
+    long int hash;
+
+    switch(type) {
+        case INTEGER:
+            py_key_arg = Py_BuildValue("(i)", key.i);
+            break;
+        case DOUBLE:
+            py_key_arg = Py_BuildValue("(f)", key.f);
+            break;
+        case STRING:
+            py_key_arg = Py_BuildValue("(s)", key.str);
+            break;
+        default:
+            PyErr_SetString(PyExc_RuntimeError, "Invalid key type.");
+            return HUGE_VAL;
+    }
+
+    py_hash = PyObject_CallObject(hash_func, py_key_arg);
+    printf("Here is the tuple: %s\n", PyString_AsString(py_key_arg->ob_type->tp_repr(py_key_arg)));
+    Py_DECREF(py_key_arg);
+
+    if ((py_hash == NULL) || (! PyInt_Check(py_hash))) {
+        PyErr_SetString(PyExc_ValueError, "Invalid hash function -- all keys must hash to an integer.");
+        return HUGE_VAL;
+    }
+
+    hash = PyInt_AsLong(py_hash);
+    printf("hash is %li\n", hash);
+    Py_DECREF(py_hash);
+
+    return hash;
+}
+
+PyObject *
+default_py_hash_funcs(void)
+{
+    PyObject* built_ins = PyEval_GetBuiltins();
+
+    PyObject* hash_key = Py_BuildValue("s", "hash");
+    PyObject* built_in_hash_func = PyDict_GetItem(built_ins, hash_key);
+
+    Py_DECREF(built_ins);
+    Py_DECREF(hash_key);
+
+    return built_in_hash_func;
+}
