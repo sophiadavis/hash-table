@@ -3,7 +3,8 @@
 #include "hashtablemodule_helpers.h"
 
 int
-set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input) {
+set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input)
+{
     size_t str_size;
     char *temp_str;
     if (PyInt_Check(input)) {
@@ -29,7 +30,8 @@ set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* 
 
 
 PyObject*
-format_python_return_val_from_item(Item *item) {
+format_python_return_val_from_item(Item *item)
+{
     PyObject* return_val = NULL;
 
     if (!item) {

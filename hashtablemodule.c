@@ -138,7 +138,8 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 }
 
 static int
-HashTablePy_print(HashTablePyObject *self, PyObject *args) {
+HashTablePy_print(HashTablePyObject *self, PyObject *args)
+{
     print_table(self->hashtable);
     return 0;
 }
