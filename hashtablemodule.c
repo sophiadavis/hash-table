@@ -53,14 +53,20 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
+char size_attr__doc__[] = "Current number of bins in hashtable.";
+char max_load_attr__doc__[] = "Maximum proportion of load to size before resizing.";
+char hash_func_attr__doc__[] = "Hash function used to determine which bin a key-value pair should be stored in.";
+
 static PyMemberDef Hashtable_members[] = {
-    {"size", T_INT, offsetof(HashTablePyObject, size), READONLY,
-     "Current number of bins in hashtable."},
-     "Maximum proportion of number of items to number of bins before resizing."},
-     {"hash_func", T_OBJECT, offsetof(HashTablePyObject, hash_func), READONLY,
-      "Hash function used to determine which bin a key-value pair should be stored in."},
+    {"size",
+        T_LONG, offsetof(HashTablePyObject, size), READONLY,
+        size_attr__doc__},
     {"max_load",
         T_DOUBLE, offsetof(HashTablePyObject, max_load), READONLY,
+        max_load_attr__doc__},
+    {"hash_func",
+        T_OBJECT, offsetof(HashTablePyObject, hash_func), READONLY,
+        hash_func_attr__doc__},
     {NULL}  /* Sentinel */
 };
 
@@ -83,6 +89,9 @@ HashTablePyObject_free(HashTablePyObject* self)
     printf("~~~~~~~~~~~~Free-ing~~~~~~~~~~~~\n");
     free_table(self->hashtable);
 }
+
+
+char HashTablePy_set__doc__[] = "Add a key-value pair to the hashtable.";
 
 static HashTablePyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
@@ -116,6 +125,8 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     return self;
 }
 
+char HashTablePy_get__doc__[] = "Lookup the value associated with the given key in the hashtable.";
+
 static PyObject *
 HashTablePy_get(HashTablePyObject *self, PyObject *args)
 {
@@ -146,6 +157,8 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
 
     return return_val;
 }
+
+char HashTablePy_pop__doc__[] = "Delete the key-value pair associated with given key from the hashtable. The value is returned.";
 
 static PyObject *
 HashTablePy_pop(HashTablePyObject *self, PyObject *args)
@@ -195,15 +208,9 @@ HashTablePy_repr(HashTablePyObject *self, PyObject *args)
 }
 
 static PyMethodDef HashTablePy_methods[] = {
-    {"set", (PyCFunction)HashTablePy_set, METH_VARARGS,
-     "Add a key-value pair to the hashtable."
-    },
-    {"get", (PyCFunction)HashTablePy_get, METH_VARARGS,
-     "Lookup the value associated with the given key in the hashtable."
-    },
-    {"pop", (PyCFunction)HashTablePy_pop, METH_VARARGS,
-     "Delete the key-value pair associated with given key from the hashtable. The value is returned."
-    },
+    {"set", (PyCFunction)HashTablePy_set, METH_VARARGS, HashTablePy_set__doc__},
+    {"get", (PyCFunction)HashTablePy_get, METH_VARARGS, HashTablePy_get__doc__},
+    {"pop", (PyCFunction)HashTablePy_pop, METH_VARARGS, HashTablePy_pop__doc__},
     {NULL}  /* Sentinel */
 };
 
@@ -262,8 +269,11 @@ inithashtable(void)
     if (PyType_Ready(&HashTablePyType) < 0)
         return;
 
-    m = Py_InitModule3("hashtable", HashTablePy_methods,
-                       "Customizable hashtables.");
+    static char hashtable__doc__[] = "This module enables users to create "
+    "hashtables, specifying the initial number of bins, "
+    "the maximum load proportion, and hash function.";
+
+    m = Py_InitModule3("hashtable", HashTablePy_methods, hashtable__doc__);
 
     Py_INCREF(&HashTablePyType);
     PyModule_AddObject(m, "HashTable", (PyObject *)&HashTablePyType);
