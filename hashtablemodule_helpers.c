@@ -51,7 +51,7 @@ format_python_return_val_from_item(Item *item)
             return_val = Py_BuildValue("i", item->value.i);
             break;
         case DOUBLE:
-            return_val = Py_BuildValue("f", item->value.f);
+            return_val = Py_BuildValue("d", item->value.f);
             break;
         case STRING:
             return_val = Py_BuildValue("s", item->value.str);

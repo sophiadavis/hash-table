@@ -188,7 +188,7 @@ Item *remove_item_from_table_by_hash(long int hash, union Hashable key, hash_typ
 
     Node *bin_list = hashtable->bin_list[bin_index];
 
-    Item *removed = lookup(key, key_type, hashtable);
+    Item *removed = lookup_by_hash(hash, key, key_type, hashtable);
     if (removed != NULL) {
         hashtable->bin_list[bin_index] = remove_item_from_bin(key, key_type, bin_list);
         hashtable->load--;
