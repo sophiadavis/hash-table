@@ -38,8 +38,6 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
 
-    printf("Size and max load proportion: %li, %f\n", size, max_load);
-
     self->hashtable = init(size, max_load);
     self->size = size;
     self->max_load = max_load;
@@ -84,7 +82,6 @@ HashTablePyObject_free(HashTablePyObject* self)
 static HashTablePyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
-    printf("setting\n");
     Py_INCREF(self);
 
     PyObject* key_input = NULL;
@@ -117,8 +114,6 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
 static PyObject *
 HashTablePy_get(HashTablePyObject *self, PyObject *args)
 {
-    printf("getting\n");
-
     PyObject* key_input = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &key_input))
@@ -150,8 +145,6 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
 static PyObject *
 HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 {
-    printf("popping\n");
-
     PyObject* key_input = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &key_input))
