@@ -240,7 +240,6 @@ Node *remove_item_from_bin(union Hashable key, hash_type key_type, Node *bin_lis
 *   All items are transferred to the new hashtable.
 ***/
 HashTable *resize(HashTable *old_hashtable) {
-    printf("Resizing from %li to %li.\n", old_hashtable->size, 2*old_hashtable->size);
     HashTable *new_hashtable = init(2*old_hashtable->size, old_hashtable->max_load_proportion);
     new_hashtable->load = 0;
 

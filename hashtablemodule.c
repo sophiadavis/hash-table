@@ -34,7 +34,7 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
     if ((hash_func != NULL) && (!PyCallable_Check(hash_func))) {
-        PyErr_SetString(PyExc_TypeError, "hash_func must be callable");
+        PyErr_SetString(PyExc_TypeError, "hash_func must be callable.");
         return -1;
     }
 
