@@ -21,7 +21,7 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 
     static char *kwlist[] = {"size", "max_load", "hash_func", NULL};
 
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ifO", kwlist, &size, &max_load, &hash_func)) {
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ldO", kwlist, &size, &max_load, &hash_func)) {
         PyErr_SetString(PyExc_TypeError, "Invalid parameters.");
         return -1;
     }
@@ -29,7 +29,7 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_TypeError, "size parameter must be a positive integer.");
         return -1;
     }
-    if ((max_load <= 0) || (max_load > 1.0)) {
+    if ((max_load <= 0) || (max_load > 1)) {
         PyErr_SetString(PyExc_TypeError, "max_load parameter must be a float between 0.0 and 1.0.");
         return -1;
     }
