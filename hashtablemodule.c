@@ -123,7 +123,7 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     }
 
     long int hash = get_hash(key, key_type, self->hash_func);
-    if (hash == (long int)HUGE_VAL) {
+    if (hash == (long int)HUGE_VAL) { // error
         free_hashable(key, key_type);
         free_hashable(value, value_type);
         return NULL;
@@ -152,7 +152,7 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
     }
 
     long int hash = get_hash(key, key_type, self->hash_func);
-    if (hash == (long int)HUGE_VAL) {
+    if (hash == (long int)HUGE_VAL) { // error
         free_hashable(key, key_type);
         return NULL;
     }
@@ -185,7 +185,7 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
     }
 
     long int hash = get_hash(key, key_type, self->hash_func);
-    if (hash == (long int)HUGE_VAL) {
+    if (hash == (long int)HUGE_VAL) { // error
         free_hashable(key, key_type);
         return NULL;
     }
