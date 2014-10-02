@@ -80,10 +80,12 @@ static void
 HashTablePyObject_dealloc(HashTablePyObject* self)
 {
     printf("~~~~~~~~~~~~Dealloc-ing~~~~~~~~~~~~\n");
-    if (self->hash_func != NULL) {
+
+    // only need to Decref hash_func if not using Python's built in hash
+    if (self->hash_func != NULL && self->hash_func != default_py_hash_func()) {
         Py_DECREF(self->hash_func);
+        printf("the hash func refcount is: %zi\n", self->hash_func->ob_refcnt);
     }
-    printf("the refcount is: %zi\n", self->hash_func->ob_refcnt);
     if (self->hashtable != NULL) {
         self->ob_type->tp_free((PyObject*)self);
     }
