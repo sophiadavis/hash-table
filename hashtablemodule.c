@@ -6,6 +6,7 @@ typedef struct {
     PyObject_HEAD
     HashTable *hashtable;
     long int size;
+    long int load;
     double max_load;
     PyObject *hash_func;
 } HashTablePyObject;
@@ -41,6 +42,7 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
     self->hashtable = init(size, max_load);
     self->size = size;
     self->max_load = max_load;
+    self->load = self->hashtable->load;
 
     if (hash_func == NULL) {
         self->hash_func = default_py_hash_func();
@@ -54,6 +56,7 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 }
 
 char size_attr__doc__[] = "Current number of bins in hashtable.";
+char load_attr__doc__[] = "Current number of key-value pairs stored in hashtable.";
 char max_load_attr__doc__[] = "Maximum proportion of load to size before resizing.";
 char hash_func_attr__doc__[] = "Hash function used to determine which bin a key-value pair should be stored in.";
 
@@ -61,6 +64,9 @@ static PyMemberDef Hashtable_members[] = {
     {"size",
         T_LONG, offsetof(HashTablePyObject, size), READONLY,
         size_attr__doc__},
+    {"load",
+        T_LONG, offsetof(HashTablePyObject, load), READONLY,
+        load_attr__doc__},
     {"max_load",
         T_DOUBLE, offsetof(HashTablePyObject, max_load), READONLY,
         max_load_attr__doc__},
@@ -122,6 +128,7 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
     }
 
     self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
+    self->load = self->hashtable->load;
     return self;
 }
 
@@ -188,6 +195,7 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
         free(key.str);
     }
 
+    self->load = self->hashtable->load;
     return return_val;
 }
 
