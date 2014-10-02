@@ -99,7 +99,7 @@ get_hash(union Hashable key, hash_type type, PyObject *hash_func)
 }
 
 PyObject *
-default_py_hash_funcs(void)
+default_py_hash_func(void)
 {
     PyObject* built_ins = PyEval_GetBuiltins();
 

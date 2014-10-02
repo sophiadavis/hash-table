@@ -45,12 +45,12 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
     self->max_load = max_load;
 
     if (hash_func == NULL) {
-        hash_func = default_py_hash_funcs();
+        self->hash_func = default_py_hash_func();
     }
-
-    self->hash_func = hash_func;
-
-    Py_INCREF(self->hash_func);
+    else {
+        self->hash_func = hash_func;
+        Py_INCREF(self->hash_func);
+    }
 
     return 0;
 }
