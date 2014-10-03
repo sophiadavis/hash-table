@@ -40,8 +40,11 @@ my_hashtable.set("hello", 3.14159)
 my_hashtable.load ## => 1
 print my_hashtable ## => *beautiful textual representation of a bin array with linked lists*
 
-	## We can also specify a different initial bin size, maximum load proportion, and hash function:  
-	## This is a hash function of my own creation. If you pass in an int or a float, it does this one thing I found on StackOverflow. If you pass in a string, it does this other thing I found on SO. Clearly an awesome hash function.
+	## We can also specify a different initial bin size, maximum load proportion, 
+	##		and hash function:  
+	## This is a hash function of my own creation. If you pass in an int or a float, 
+	## it does this one thing I found on StackOverflow. If you pass in a string, it 
+	## does this other thing I found on SO. Clearly an awesome hash function.
 def my_hash(obj):
     if isinstance(obj, int):
         # http://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key
@@ -53,7 +56,8 @@ def my_hash(obj):
         ord3 = lambda x : '%.3d' % ord(x)
         return int(''.join(map(ord3, obj)))
         
-	## If we instantiate a hashtable with this custom hash function, my C program will call the Python function!
+	## If we instantiate a hashtable with this custom hash function, 
+	##		my C program will call the Python function!
 h = hashtable.HashTable(size = 8, max_load = 0.90, hash_func = my_hash)
 
 h.set("hello", "world") ## updates h and returns None
