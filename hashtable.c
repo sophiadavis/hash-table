@@ -885,7 +885,24 @@ int main() {
     hashtable = add(HUGE_VAL, key, INTEGER, value, INTEGER, hashtable);
     print_table(hashtable);
 
+
+    union Hashable str_key2;
+    union Hashable str_value2;
+
+    str_key2.str = malloc(50);
+    snprintf(str_key2.str, 50, "чебурашка");
+    str_value2.str = malloc(50);
+    snprintf(str_value2.str, 50, "крокодил гена");
+
+    printf("\n~~~~~Adding %s -- %s (hash: %li)\n", str_key2.str, str_value2.str, calculate_hash(str_key2, 2));
+    hashtable = add(HUGE_VAL, str_key2, STRING, str_value2, STRING, hashtable);
+
+    char *str = stringify_table(hashtable);
+
+    printf("here is the str: %s\n", str);
+
     free_table(hashtable);
+    free(str);
 
     return 0;
 }
