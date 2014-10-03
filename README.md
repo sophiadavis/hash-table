@@ -36,7 +36,7 @@ my_hashtable.size ## => 4 (default)
 my_hashtable.max_load ## => 0.5 (default)
 my_hashtable.hash_func ## => <built-in function hash> (defaults to Python's built in hash function)
 my_hashtable.load ## => 0
-my_hashtable.set("hello", 3.14159)
+my_hashtable.set("hello", 3.14159) ## updates my_hashtable and returns None
 my_hashtable.load ## => 1
 print my_hashtable ## => *beautiful textual representation of a bin array with linked lists*
 
