@@ -97,7 +97,7 @@ HashTablePyObject_free(HashTablePyObject* self)
 
 char HashTablePy_set__doc__[] = "Add a key-value pair to the hashtable.";
 
-static HashTablePyObject *
+static PyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
     PyObject* key_input = NULL;
@@ -123,11 +123,9 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
         return NULL;
     }
 
-    Py_INCREF(self);
-
     self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
     self->load = self->hashtable->load;
-    return self;
+    Py_RETURN_NONE;
 }
 
 char HashTablePy_get__doc__[] = "Lookup the value associated with the given key in the hashtable.";
