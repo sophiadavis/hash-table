@@ -49,8 +49,9 @@ HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
     }
     else {
         self->hash_func = hash_func;
-        Py_INCREF(self->hash_func);
     }
+
+    Py_INCREF(self->hash_func);
 
     return 0;
 }
@@ -81,10 +82,8 @@ HashTablePyObject_dealloc(HashTablePyObject* self)
 {
     printf("~~~~~~~~~~~~Dealloc-ing~~~~~~~~~~~~\n");
 
-    // only need to Decref hash_func if not using Python's built in hash
-    if (self->hash_func != NULL && self->hash_func != default_py_hash_func()) {
+    if (self->hash_func != NULL){
         Py_DECREF(self->hash_func);
-        printf("the hash func refcount is: %zi\n", self->hash_func->ob_refcnt);
     }
     if (self->hashtable != NULL) {
         self->ob_type->tp_free((PyObject*)self);
@@ -104,8 +103,6 @@ char HashTablePy_set__doc__[] = "Add a key-value pair to the hashtable.";
 static HashTablePyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
-    Py_INCREF(self);
-
     PyObject* key_input = NULL;
     PyObject* value_input = NULL;
 
@@ -128,6 +125,8 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
         free_hashable(value, value_type);
         return NULL;
     }
+
+    Py_INCREF(self);
 
     self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
     self->load = self->hashtable->load;
@@ -196,6 +195,7 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
     if (key_type == STRING) {
         free(key.str);
     }
+    free_item(item);
 
     self->load = self->hashtable->load;
     return return_val;
