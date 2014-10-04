@@ -240,12 +240,12 @@ static PyTypeObject HashTablePyType = {
     0,                                           /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                          /* tp_flags */
     "Customizeable HashTable!",                  /* tp_doc */
-    0,		                                     /* tp_traverse */
-    0,		                                     /* tp_clear */
-    0,		                                     /* tp_richcompare */
-    0,		                                     /* tp_weaklistoffset */
-    0,		                                     /* tp_iter */
-    0,		                                     /* tp_iternext */
+    0,                                           /* tp_traverse */
+    0,                                           /* tp_clear */
+    0,                                           /* tp_richcompare */
+    0,                                           /* tp_weaklistoffset */
+    0,                                           /* tp_iter */
+    0,                                           /* tp_iternext */
     HashTablePy_methods,                         /* tp_methods */
     Hashtable_members,                           /* tp_members */
     0,                                           /* tp_getset */
