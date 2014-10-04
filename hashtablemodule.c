@@ -80,9 +80,7 @@ static PyMemberDef Hashtable_members[] = {
 static void
 HashTablePyObject_dealloc(HashTablePyObject* self)
 {
-    if (self->hash_func != NULL){
-        Py_DECREF(self->hash_func);
-    }
+        Py_XDECREF(self->hash_func);
     if (self->hashtable != NULL) {
         self->ob_type->tp_free((PyObject*)self);
     }
