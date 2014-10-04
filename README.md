@@ -7,7 +7,7 @@ October 2014
 
 ----------
 ### C Program
-This is a hashtable implementation in C that allows users to experiment with how hashtable parameters impact performance. The hashtable consists of an array of "bins". Key-value pairs are stored based on the hash of the key -- this hash is used to determine which bin the key-value pair should be assigned to. Each bin stores a linked list of all key-value pairs assigned to that bin.  
+This is a hashtable implementation in C that allows users to experiment with how hashtable parameters impact performance. The hashtable consists of an array of "bins". Key-value pairs are stored based on the hash of the key -- this hash is used to determine which bin the key-value pair should be assigned to. In this implementation, each bin stores a linked list of all key-value pairs assigned to that bin.  
 
 In the initialization function, the user can specify the initial number of bins and the maximum load proportion. The maximum load proportion is a ratio of number of key-value pairs to total number of bins. When this ratio is reached, the hashtable will "resize" itself -- creating a new bin array with double the number of bins in the original hashtable. All key-value pairs will be reassigned based on this new bin-size. The user also controls the hash function used to hash each key, because the hash associated with each key must be passed in to functions for adding to, searching, or removing from the hashtable. If no hash is specified (or rather, HUGE_VAL is passed in for the hash value), a very pathetic hash function is used. Keys and values can be strings, integers, or floats. 
 
