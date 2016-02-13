@@ -77,7 +77,7 @@ int hashable_equal(union Hashable h1, hash_type type1, union Hashable h2, hash_t
 
 /***
 * Adds a key, value pair to hashtable, resizing if hashtable's max_load has been reached
-*   If a key's hash has not yet been computed, the hash should be set to HUGE_VAL.
+*   If a key's hash has not yet been computed, the hash should be set to LONG_MAX.
 *   This seems hacky, but it's to avoid re-hashing keys when the hashtable is resized.
 ***/
 HashTable *add(long int hash, union Hashable key, hash_type key_type, union Hashable value, hash_type value_type, HashTable *hashtable) {
@@ -85,7 +85,7 @@ HashTable *add(long int hash, union Hashable key, hash_type key_type, union Hash
         hashtable = resize(hashtable);
     }
 
-    if (hash == (long int)HUGE_VAL) {
+    if (hash == LONG_MAX) {
         hash = calculate_hash(key, key_type);
     }
 
@@ -440,7 +440,7 @@ int main() {
     value.i = 0;
     int key_type = INTEGER;
     int value_type = INTEGER;
-    long int hash = HUGE_VAL; // pass in HUGE_VAL to use pitiful default hash function
+    long int hash = LONG_MAX; // pass in LONG_MAX to use pitiful default hash function
 
     printf("\n~~~~~Adding %li -- %li (hash: %li)\n", key.i, value.i, calculate_hash(key, key_type));
     hashtable = add(hash, key, key_type, value, value_type, hashtable);
@@ -487,7 +487,7 @@ int main() {
     snprintf(str_value2.str, 50, "крокодил гена");
 
     printf("\n~~~~~Adding %s -- %s (hash: %li)\n", str_key2.str, str_value2.str, calculate_hash(str_key2, 2));
-    hashtable = add(HUGE_VAL, str_key2, STRING, str_value2, STRING, hashtable);
+    hashtable = add(LONG_MAX, str_key2, STRING, str_value2, STRING, hashtable);
 
     // We can write the results of print_hashtable to a string.
     char *str = stringify_table(hashtable);
