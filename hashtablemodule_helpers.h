@@ -1,4 +1,5 @@
 #include "hashtable.h"
+#include "limits.h"
 
 int set_hashable_from_user_input(union Hashable *to_set, hash_type *type, PyObject* input);
 void free_hashable(union Hashable hashable, hash_type type);

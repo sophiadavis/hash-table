@@ -81,7 +81,7 @@ get_hash(union Hashable key, hash_type type, PyObject *hash_func)
             break;
         default:
             PyErr_SetString(PyExc_RuntimeError, "Invalid key type.");
-            return HUGE_VAL;
+            return LONG_MAX;
     }
 
     py_hash = PyObject_CallObject(hash_func, py_key_arg);
@@ -89,7 +89,7 @@ get_hash(union Hashable key, hash_type type, PyObject *hash_func)
 
     if ((py_hash == NULL) || (! PyInt_Check(py_hash))) {
         PyErr_SetString(PyExc_ValueError, "Invalid hash function -- all keys must hash to an integer.");
-        return HUGE_VAL;
+        return LONG_MAX;
     }
 
     hash = PyInt_AsLong(py_hash);
