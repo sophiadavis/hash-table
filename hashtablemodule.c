@@ -126,7 +126,8 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
         return NULL;
     }
 
-    Py_INCREF(self);
+    // INCREF
+    // Py_INCREF(self);
 
     self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
     self->load = self->hashtable->load;
