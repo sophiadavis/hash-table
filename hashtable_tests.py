@@ -4,6 +4,7 @@ import string
 import unittest
 
 def my_hash(obj):
+    print "now hashing " + str(obj)
     if isinstance(obj, int):
         # http://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key
         return obj*2654435761 % 2**32
