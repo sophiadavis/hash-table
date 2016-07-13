@@ -41,8 +41,10 @@ typedef struct hashtable {
 * Function declarations
 ***/
 HashTable *init(long int size, double max_load_proportion);
+void print_table_simple(HashTable *hashtable);
 void print_table(HashTable *hashtable);
 void print_item(Item *item);
+char *stringify_table_simple(HashTable *hashtable);
 char *stringify_table(HashTable *hashtable);
 char *stringify_item(Item *item);
 void free_table(HashTable *hashtable);
