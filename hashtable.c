@@ -262,6 +262,19 @@ HashTable *resize(HashTable *old_hashtable) {
 /***
 * Helper functions to print hashtables and data items
 ***/
+void print_table_simple(HashTable *hashtable) {
+    long int i;
+    for (i = 0; i < hashtable->size; i++) {
+        printf("[]");
+        Node *current_node = hashtable->bin_list[i];
+        while (current_node != NULL) {
+            printf("*");
+            current_node = current_node->next;
+        }
+        printf("\n");
+    }
+}
+
 void print_table(HashTable *hashtable) {
     printf("\n********************\n--------HashTable--------\n-Array size: "
            "%li -Load: %li -Max Load Prop: %f -Current Load Prop: %f\n",
@@ -318,6 +331,24 @@ void print_item(Item *item) {
         }
         printf("------\n");
     }
+}
+
+char *stringify_table_simple(HashTable *hashtable) {
+    int max_len = 200 + 200 * hashtable->load; // a guess
+    int len = 0;
+    char *hashtable_string = malloc(max_len);
+
+    long int i;
+    for (i = 0; i < hashtable->size; i++) {
+        len = len + snprintf(hashtable_string + len, max_len - len, "[]");
+        Node *current_node = hashtable->bin_list[i];
+        while (current_node != NULL) {
+            len = len + snprintf(hashtable_string + len, max_len - len, "*");
+            current_node = current_node->next;
+        }
+        len = len + snprintf(hashtable_string + len, max_len - len, "\n");
+    }
+    return hashtable_string;
 }
 
 char *stringify_table(HashTable *hashtable) {

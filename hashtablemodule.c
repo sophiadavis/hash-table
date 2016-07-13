@@ -205,14 +205,14 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 static int
 HashTablePy_print(HashTablePyObject *self, PyObject *args)
 {
-    print_table(self->hashtable);
+    print_table_simple(self->hashtable);
     return 0;
 }
 
 static PyObject *
 HashTablePy_repr(HashTablePyObject *self, PyObject *args)
 {
-    char *repr = stringify_table(self->hashtable);
+    char *repr = stringify_table_simple(self->hashtable);
     PyObject* py_repr = Py_BuildValue("s", repr);
     free(repr);
     return py_repr;
