@@ -82,7 +82,7 @@ HashTablePyObject_dealloc(HashTablePyObject* self)
 {
     // DECREF DEMO
     Py_XDECREF(self->hash_func);
-    printf("~~~~~~~~~~~~Dealloc-ing~~~~~~~~~~~~\n");
+    printf("C: ---------> Dealloc-ing\n");
     if (self->hashtable != NULL) {
         self->ob_type->tp_free((PyObject*)self);
     }
@@ -91,6 +91,7 @@ HashTablePyObject_dealloc(HashTablePyObject* self)
 static void
 HashTablePyObject_free(HashTablePyObject* self)
 {
+    printf("C: ---------> Free-ing\n");
     free_table(self->hashtable);
 }
 
