@@ -80,7 +80,7 @@ static PyMemberDef Hashtable_members[] = {
 static void
 HashTablePyObject_dealloc(HashTablePyObject* self)
 {
-    printf("~~~~~~~~~~~~Dealloc-ing~~~~~~~~~~~~\n");
+    printf("C: ---------> Dealloc-ing\n");
 
     if (self->hash_func != NULL){
         Py_DECREF(self->hash_func);
@@ -93,7 +93,7 @@ HashTablePyObject_dealloc(HashTablePyObject* self)
 static void
 HashTablePyObject_free(HashTablePyObject* self)
 {
-    printf("~~~~~~~~~~~~Free-ing~~~~~~~~~~~~\n");
+    printf("C: ---------> Free-ing\n");
     free_table(self->hashtable);
 }
 
