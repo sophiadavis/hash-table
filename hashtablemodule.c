@@ -14,6 +14,7 @@ typedef struct {
 static int
 HashTablePyObject_init(HashTablePyObject *self, PyObject *args, PyObject *kwds)
 {
+    printf("C module:  ----> initializing new HashTable object\n");
     self->hashtable = NULL;
 
     long int size = 4;
@@ -82,7 +83,7 @@ HashTablePyObject_dealloc(HashTablePyObject* self)
 {
     // DECREF DEMO
     Py_XDECREF(self->hash_func);
-    printf("C: ---------> Dealloc-ing\n");
+    printf("C module:  ----> Dealloc-ing\n");
     if (self->hashtable != NULL) {
         self->ob_type->tp_free((PyObject*)self);
     }
@@ -91,7 +92,7 @@ HashTablePyObject_dealloc(HashTablePyObject* self)
 static void
 HashTablePyObject_free(HashTablePyObject* self)
 {
-    printf("C: ---------> Free-ing\n");
+    printf("C module:  ----> Free-ing\n");
     free_table(self->hashtable);
 }
 
@@ -101,6 +102,7 @@ char HashTablePy_set__doc__[] = "Add a key-value pair to the hashtable.";
 static PyObject *
 HashTablePy_set(HashTablePyObject *self, PyObject *args)
 {
+    printf("C module:  ----> setting\n");
     PyObject* key_input = NULL;
     PyObject* value_input = NULL;
 
@@ -123,7 +125,6 @@ HashTablePy_set(HashTablePyObject *self, PyObject *args)
         free_hashable(value, value_type);
         return NULL;
     }
-
     self->hashtable = add(hash, key, key_type, value, value_type, self->hashtable);
     self->load = self->hashtable->load;
     Py_RETURN_NONE;
@@ -134,6 +135,7 @@ char HashTablePy_get__doc__[] = "Lookup the value associated with the given key 
 static PyObject *
 HashTablePy_get(HashTablePyObject *self, PyObject *args)
 {
+    printf("C module:  ----> getting\n");
     PyObject* key_input = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &key_input))
@@ -151,7 +153,6 @@ HashTablePy_get(HashTablePyObject *self, PyObject *args)
         free_hashable(key, key_type);
         return NULL;
     }
-
     Item *item = lookup_by_hash(hash, key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
 
@@ -167,6 +168,7 @@ char HashTablePy_pop__doc__[] = "Delete the key-value pair associated with given
 static PyObject *
 HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 {
+    printf("C module:  ----> popping\n");
     PyObject* key_input = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &key_input))
@@ -184,7 +186,6 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
         free_hashable(key, key_type);
         return NULL;
     }
-
     Item *item = remove_item_from_table_by_hash(hash, key, key_type, self->hashtable);
     PyObject* return_val = format_python_return_val_from_item(item);
 
@@ -200,6 +201,7 @@ HashTablePy_pop(HashTablePyObject *self, PyObject *args)
 static int
 HashTablePy_print(HashTablePyObject *self, PyObject *args)
 {
+    printf("C module:  ----> calling print function\n");
     print_table_simple(self->hashtable);
     return 0;
 }
@@ -207,6 +209,7 @@ HashTablePy_print(HashTablePyObject *self, PyObject *args)
 static PyObject *
 HashTablePy_repr(HashTablePyObject *self, PyObject *args)
 {
+    printf("C module:  ----> getting string repr\n");
     char *repr = stringify_table_simple(self->hashtable);
     PyObject* py_repr = Py_BuildValue("s", repr);
     free(repr);
@@ -280,7 +283,9 @@ inithashtable(void)
     "the maximum load proportion, and hash function.";
 
     m = Py_InitModule3("hashtable", HashTablePy_methods, hashtable__doc__);
+    printf("C module:  ----> module initialized\n");
 
     Py_INCREF(&HashTablePyType);
     PyModule_AddObject(m, "HashTable", (PyObject *)&HashTablePyType);
+    printf("C module:  ----> HashTable type added to module\n");
 }

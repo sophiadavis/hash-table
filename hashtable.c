@@ -8,9 +8,11 @@ HashTable *init(long int size, double max_load_proportion) {
     hashtable->size = size;
     hashtable->max_load_proportion = max_load_proportion;
     hashtable->load = 0;
+    printf("C library: ---------> mallocing space for array\n");
     hashtable->bin_list = malloc(size*sizeof(Node*));
 
     long int i;
+    printf("C library: ---------> creating linked lists\n");
     for (i = 0; i < size; i++) {
         Node *null_node;
         null_node = NULL;
@@ -121,6 +123,7 @@ Node *add_item_to_bin(Item *item, Node *bin_list, HashTable *hashtable) {
     Node *head = bin_list;
     Node *prev_node;
     Node *current_node = bin_list;
+    printf("C library: ---------> adding item to linked list\n");
     if (current_node == NULL) {
         Node *new = malloc(sizeof(Node));
         new->item = item;
@@ -157,7 +160,9 @@ Item *lookup_by_hash(long int hash, union Hashable key, hash_type key_type, Hash
 
     Node *current_node = hashtable->bin_list[bin_index];
 
+    printf("C library: ---------> searching for item in linked list\n");
     if (current_node == NULL) {
+        printf("C library: ---------> item not found\n");
         return NULL;
     }
     else {
@@ -169,6 +174,7 @@ Item *lookup_by_hash(long int hash, union Hashable key, hash_type key_type, Hash
             current_node = current_node->next;
         }
     }
+    printf("C library: ---------> item not found\n");
     return NULL;
 }
 
@@ -231,7 +237,7 @@ Node *remove_item_from_bin(union Hashable key, hash_type key_type, Node *bin_lis
             current_node = current_node->next;
         }
     }
-    printf("Item not found\n");
+    printf("C library: ---------> removing item from table\n");
     return head;
 }
 
@@ -240,6 +246,7 @@ Node *remove_item_from_bin(union Hashable key, hash_type key_type, Node *bin_lis
 *   All items are transferred to the new hashtable.
 ***/
 HashTable *resize(HashTable *old_hashtable) {
+    printf("C library: ---------> Resizing!\n");
     HashTable *new_hashtable = init(2*old_hashtable->size, old_hashtable->max_load_proportion);
     new_hashtable->load = 0;
 
@@ -263,6 +270,7 @@ HashTable *resize(HashTable *old_hashtable) {
 * Helper functions to print hashtables and data items
 ***/
 void print_table_simple(HashTable *hashtable) {
+    printf("C library: ---------> printing\n");
     long int i;
     for (i = 0; i < hashtable->size; i++) {
         printf("[]");
@@ -334,6 +342,7 @@ void print_item(Item *item) {
 }
 
 char *stringify_table_simple(HashTable *hashtable) {
+    printf("C library: ---------> making string representation\n");
     int max_len = 200 + 200 * hashtable->load; // a guess
     int len = 0;
     char *hashtable_string = malloc(max_len);
@@ -425,6 +434,7 @@ char *stringify_item(Item *item) {
 void free_table(HashTable *hashtable) {
     long int i;
     for (i = 0; i < hashtable->size; i++) {
+        printf("C library: ---------> freeing linked list at bucket %li\n", i);
         Node *current_node = hashtable->bin_list[i];
         while (current_node != NULL) {
             free_item(current_node->item);
